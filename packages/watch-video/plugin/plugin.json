@@ -1,0 +1,8 @@
+{
+  "name": "watch-video",
+  "version": "0.1.0",
+  "description": "Local video analysis skill and commands for agent tooling.",
+  "author": "Nagarjuna Boddu",
+  "repository": "https://github.com/heyNag/agent-tools",
+  "license": "MIT"
+}

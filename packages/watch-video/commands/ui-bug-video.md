@@ -1,0 +1,21 @@
+---
+description: Analyze a UI bug or screen recording with timestamped visual evidence.
+argument-hint: <video-url-or-path> [expected behavior]
+allowed-tools: [Bash, Read]
+---
+
+Use `watch-video` on the UI bug recording: $ARGUMENTS
+
+Inspect frames closely and align them with the transcript if audio is present.
+Return:
+
+- observed symptom
+- expected behavior if the user provided it
+- timestamped evidence
+- visible UI state, cursor/action sequence, and transitions
+- likely cause ranked by confidence
+- concrete next debugging checks
+- uncertainty and missing evidence
+
+Avoid over-claiming. If the video does not show enough detail, name the missing
+logs, code path, browser console, network request, or repro step needed next.

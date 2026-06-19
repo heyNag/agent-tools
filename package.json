@@ -1,0 +1,11 @@
+{
+  "name": "agent-tools",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Personal agent tooling workspace.",
+  "scripts": {
+    "test": "python3 -m pytest",
+    "build:mcp": "npm --prefix mcp/watch-video run build"
+  },
+  "license": "MIT"
+}
