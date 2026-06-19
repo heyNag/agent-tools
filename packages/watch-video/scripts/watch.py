@@ -59,6 +59,20 @@ def safe_run_id(source: str) -> str:
     return f"{stamp}-{slug}-{digest}"
 
 
+def create_run_dir(base_dir: str | Path, source: str) -> Path:
+    """Create a predictable run directory without overwriting prior runs."""
+    base = Path(base_dir).expanduser().resolve()
+    run_id = safe_run_id(source)
+    for suffix in ["", *[f"-{index:02d}" for index in range(1, 100)]]:
+        candidate = base / f"{run_id}{suffix}"
+        try:
+            candidate.mkdir(parents=True, exist_ok=False)
+            return candidate
+        except FileExistsError:
+            continue
+    raise RuntimeError(f"could not create a unique run directory under {base}")
+
+
 def write_json(path: Path, data: object) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
@@ -395,10 +409,12 @@ def main() -> int:
     parser.add_argument("--frame-width", type=int, default=960)
     args = parser.parse_args()
 
-    run_dir = Path(args.out_dir).expanduser().resolve() / safe_run_id(args.source)
+    try:
+        run_dir = create_run_dir(args.out_dir, args.source)
+    except RuntimeError as exc:
+        raise SystemExit(str(exc)) from exc
     media_dir = run_dir / "media"
     frames_dir = run_dir / "frames"
-    run_dir.mkdir(parents=True, exist_ok=False)
 
     print(f"[watch-video] run directory: {run_dir}", file=sys.stderr)
 

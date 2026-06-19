@@ -23,30 +23,22 @@ an MCP gateway.
 - focused ranges with `--start`, `--end`, or `--duration`
 - optional frame extraction with `ffmpeg`
 
-## Requirements
+## Quickstart
 
-On macOS:
+Install local dependencies on macOS:
 
 ```sh
 brew install yt-dlp ffmpeg jq
 ```
 
-Python 3.11+ is recommended. Node.js is only needed for the placeholder MCP
-server under `mcp/watch-video`.
-
-## Groq Setup
-
-Set a Groq key in your shell or copy `.env.example` to `.env` and source it in
-your preferred way:
+Set a Groq key for Whisper fallback:
 
 ```sh
 export GROQ_API_KEY="..."
 export GROQ_MODEL="whisper-large-v3-turbo"
 ```
 
-The helper scripts never print the API key.
-
-## Try a 30-second YouTube Scan
+Run a 30-second YouTube scan. Quote URLs in zsh so `?` is not treated as a glob:
 
 ```sh
 python3 packages/watch-video/scripts/watch.py \
@@ -56,11 +48,30 @@ python3 packages/watch-video/scripts/watch.py \
   --frame-interval 5
 ```
 
+Install into Claude and Codex:
+
+```sh
+./scripts/install-all.sh
+```
+
 The run artifacts are written under `.watch-video/runs/<run-id>/`, including
 `metadata.json`, `audio.mp3`, transcript files, extracted frames, and
 `report.md`.
 
+The helper scripts never print the API key. CI does not require `GROQ_API_KEY`.
+
+## Requirements
+
+Python 3.11+ is recommended. Node.js is only needed for the placeholder MCP
+server under `mcp/watch-video`.
+
 ## Install Locally
+
+Preview the install without writing to local agent folders:
+
+```sh
+DRY_RUN=1 ./scripts/install-all.sh
+```
 
 Install into Claude local folders:
 
@@ -81,7 +92,9 @@ Install both:
 ```
 
 These scripts are idempotent. The repo remains the source of truth; installed
-files are copies for local agent runtimes.
+files are copies for local agent runtimes. Installers only replace files or
+directories marked as `agent-tools` managed; set `FORCE=1` only after inspecting
+any existing unmanaged target.
 
 ## Groq Smoke Test
 
@@ -91,6 +104,16 @@ files are copies for local agent runtimes.
 
 This checks `GROQ_API_KEY`, calls Groq Whisper with
 `whisper-large-v3-turbo` by default, and pretty prints with `jq` when available.
+
+## Common Commands
+
+```sh
+make test
+make install
+make install-dry-run
+make groq-test AUDIO=path/to/audio.mp3
+make mcp-build
+```
 
 ## Repo Structure
 
@@ -121,3 +144,10 @@ scripts/
 deployable placeholder for a future MCP server that can wrap the local
 `watch-video` scripts. It is not a gateway and does not integrate video
 processing yet.
+
+## Next Roadmap
+
+- Better transcript/caption fallback and language selection.
+- Prettier reports with clearer visual evidence tables.
+- Real MCP tools for status, metadata inspection, and safe local job launching.
+- Optional deployment to Railway later, once the MCP API surface is real.

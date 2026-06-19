@@ -35,6 +35,6 @@ jobs:
       - name: Build MCP placeholder
         run: |
           if [ -f mcp/watch-video/package.json ]; then
-            npm --prefix mcp/watch-video install
+            npm --prefix mcp/watch-video ci
             npm --prefix mcp/watch-video run build
           fi

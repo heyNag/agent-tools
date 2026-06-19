@@ -46,7 +46,8 @@ python3 scripts/watch.py "<source>" --transcriber none --frames
 ```
 
 The script writes a run directory under `.watch-video/runs/<run-id>/` and prints
-the final `report.md` path.
+the final `report.md` path. Quote URLs in zsh and other shells where `?` may be
+treated as a glob.
 
 ## Evidence To Use
 

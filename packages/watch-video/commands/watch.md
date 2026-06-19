@@ -4,12 +4,15 @@ argument-hint: <video-url-or-path> [question]
 allowed-tools: [Bash, Read]
 ---
 
+<!-- agent-tools-managed: watch-video command -->
+
 Use the `watch-video` skill with the user's arguments: $ARGUMENTS
 
-Run `packages/watch-video/scripts/watch.py` on the source. Prefer captions,
-extract a focused audio clip, use Groq Whisper only when captions are missing,
-extract frames when visual evidence matters, then answer from `report.md`,
-`transcript.md`, and the frame images.
+Run the `watch.py` script from the installed `watch-video` skill, or
+`packages/watch-video/scripts/watch.py` when working from this repository.
+Prefer captions, extract a focused audio clip, use Groq Whisper only when
+captions are missing, extract frames when visual evidence matters, then answer
+from `report.md`, `transcript.md`, and the frame images.
 
 Return a concise summary, timestamped timeline, visible UI/actions,
 commands/tools mentioned, implementation or reproduction steps, and uncertainty.

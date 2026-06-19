@@ -1,6 +1,26 @@
 .DS_Store
 .env
 .watch-video/
+
+# Watch Video run artifacts when custom output dirs are placed in the repo.
+**/audio.mp3
+**/metadata.json
+**/transcript.json
+**/transcript.md
+**/groq_transcript.raw.json
+**/report.md
+**/frames/
+
+# Local media scratch files.
+*.mp3
+*.wav
+*.m4a
+*.aac
+*.mp4
+*.mov
+*.mkv
+*.webm
+
 __pycache__/
 *.py[cod]
 .pytest_cache/

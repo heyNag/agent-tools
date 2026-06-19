@@ -5,7 +5,9 @@
   "description": "Personal agent tooling workspace.",
   "scripts": {
     "test": "python3 -m pytest",
-    "build:mcp": "npm --prefix mcp/watch-video run build"
+    "syntax": "python3 -m py_compile packages/watch-video/scripts/*.py",
+    "build:mcp": "npm --prefix mcp/watch-video run build",
+    "install:dry-run": "DRY_RUN=1 ./scripts/install-all.sh"
   },
   "license": "MIT"
 }

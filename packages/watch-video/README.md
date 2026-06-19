@@ -26,10 +26,18 @@ export GROQ_API_KEY="..."
 export GROQ_MODEL="whisper-large-v3-turbo"
 ```
 
-## Usage
+## Quickstart
 
 ```sh
-python3 scripts/watch.py "https://www.youtube.com/watch?v=dQw4w9WgXcQ" --duration 30
+python3 scripts/watch.py "https://www.youtube.com/watch?v=dQw4w9WgXcQ" \
+  --duration 30 \
+  --frames \
+  --frame-interval 5
+```
+
+Focused local examples:
+
+```sh
 python3 scripts/watch.py ./screen-recording.mov --start 00:15 --end 00:45 --frames
 python3 scripts/watch.py "$URL" --transcriber none --frame-interval 10
 ```
