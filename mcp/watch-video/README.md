@@ -11,11 +11,12 @@ Current tool:
 ## Development
 
 ```sh
-npm ci
 npm run build
 npm start
 ```
 
-The server speaks JSON-RPC over stdio and implements only the small subset
-needed for the status tool. A future version can replace this manual skeleton
-with the official MCP SDK once the video-processing API surface is clear.
+This placeholder currently has no npm dependencies, which keeps CI offline and
+no-secret. The server speaks JSON-RPC over stdio and implements only the small
+subset needed for the status tool. A future version can replace this manual
+skeleton with the official MCP SDK once the video-processing API surface is
+clear.

@@ -4,9 +4,11 @@
   "private": true,
   "description": "Personal agent tooling workspace.",
   "scripts": {
-    "test": "python3 -m pytest",
-    "syntax": "python3 -m py_compile packages/watch-video/scripts/*.py",
+    "test": "python3 -m unittest discover -s packages/watch-video/tests -p 'test_*.py'",
+    "syntax": "python3 -m py_compile packages/watch-video/scripts/*.py && bash -n scripts/*.sh",
     "build:mcp": "npm --prefix mcp/watch-video run build",
+    "build:packages": "./scripts/build-packages.sh",
+    "verify:packages": "./scripts/verify-packages.sh",
     "install:dry-run": "DRY_RUN=1 ./scripts/install-all.sh"
   },
   "license": "MIT"

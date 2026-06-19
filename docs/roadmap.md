@@ -16,6 +16,12 @@ behavior when native captions are incomplete or unavailable.
 
 Make local use smoother through clearer commands, safer install behavior, and
 agent-friendly instructions. Keep installed copies downstream of repo source.
+Public packages should follow this shape:
+
+- `packages/<name>` for source of truth
+- `plugins/<name>` when the package targets Claude Code
+- `codex/<name>` when the package targets Codex or generic skills
+- `mcp/<name>` only when the package needs an MCP server
 
 ## Phase 4: Real MCP Tools
 

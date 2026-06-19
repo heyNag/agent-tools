@@ -10,6 +10,37 @@ Source of truth:
 packages/watch-video
 ```
 
+Public install targets:
+
+```text
+plugins/watch-video
+codex/watch-video
+```
+
+## Install
+
+Claude Code marketplace install:
+
+```text
+/plugin marketplace add heyNag/agent-tools
+/plugin install watch-video@heynag-agent-tools
+```
+
+Codex or generic skill install:
+
+```sh
+git clone https://github.com/heyNag/agent-tools.git
+mkdir -p ~/.codex/skills
+rm -rf ~/.codex/skills/watch-video
+cp -R agent-tools/codex/watch-video ~/.codex/skills/watch-video
+```
+
+Local development install from source:
+
+```sh
+./scripts/install-all.sh
+```
+
 ## Current Design
 
 The `watch.py` flow is:

@@ -1,48 +1,33 @@
 import readline from "node:readline";
 
-type JsonValue =
-  | null
-  | boolean
-  | number
-  | string
-  | JsonValue[]
-  | { [key: string]: JsonValue };
-
-type JsonRpcRequest = {
-  jsonrpc?: string;
-  id?: string | number | null;
-  method?: string;
-  params?: Record<string, unknown>;
-};
-
 const serverInfo = {
   name: "watch-video",
   version: "0.1.0"
 };
 
-function writeMessage(message: JsonValue): void {
+function writeMessage(message) {
   process.stdout.write(`${JSON.stringify(message)}\n`);
 }
 
-function result(id: JsonRpcRequest["id"], value: JsonValue): void {
+function result(id, value) {
   if (id === undefined) {
     return;
   }
   writeMessage({ jsonrpc: "2.0", id, result: value });
 }
 
-function error(id: JsonRpcRequest["id"], code: number, message: string): void {
+function error(id, code, message) {
   if (id === undefined) {
     return;
   }
   writeMessage({ jsonrpc: "2.0", id, error: { code, message } });
 }
 
-function statusPayload(): JsonValue {
+function statusPayload() {
   return { ok: true, name: "watch-video" };
 }
 
-function handleToolsCall(request: JsonRpcRequest): void {
+function handleToolsCall(request) {
   const params = request.params ?? {};
   const name = params.name;
   if (name !== "watch_video_status") {
@@ -60,7 +45,7 @@ function handleToolsCall(request: JsonRpcRequest): void {
   });
 }
 
-function handleRequest(request: JsonRpcRequest): void {
+function handleRequest(request) {
   switch (request.method) {
     case "initialize":
       result(request.id, {
@@ -109,14 +94,14 @@ const rl = readline.createInterface({
   crlfDelay: Infinity
 });
 
-rl.on("line", (line: string) => {
+rl.on("line", (line) => {
   if (!line.trim()) {
     return;
   }
 
-  let request: JsonRpcRequest;
+  let request;
   try {
-    request = JSON.parse(line) as JsonRpcRequest;
+    request = JSON.parse(line);
   } catch {
     writeMessage({
       jsonrpc: "2.0",

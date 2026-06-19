@@ -1,17 +1,14 @@
-.PHONY: test syntax install install-dry-run groq-test mcp-build ci-local
+.PHONY: test syntax install install-dry-run groq-test mcp-build build-claude-plugin build-codex-skill build-packages verify-packages ci-local
 
 AUDIO ?=
-PYTHON ?= .venv/bin/python
+PYTHON ?= python3
 
-$(PYTHON):
-	python3 -m venv .venv
-	$(PYTHON) -m pip install --upgrade pip pytest
-
-test: $(PYTHON)
-	$(PYTHON) -m pytest
+test:
+	$(PYTHON) -m unittest discover -s packages/watch-video/tests -p 'test_*.py'
 
 syntax:
 	python3 -m py_compile packages/watch-video/scripts/*.py
+	bash -n scripts/*.sh
 
 install:
 	./scripts/install-all.sh
@@ -27,7 +24,18 @@ groq-test:
 	./scripts/test-groq.sh "$(AUDIO)"
 
 mcp-build:
-	npm --prefix mcp/watch-video ci
 	npm --prefix mcp/watch-video run build
 
-ci-local: test syntax mcp-build install-dry-run
+build-claude-plugin:
+	./scripts/build-claude-plugin.sh
+
+build-codex-skill:
+	./scripts/build-codex-skill.sh
+
+build-packages:
+	./scripts/build-packages.sh
+
+verify-packages:
+	./scripts/verify-packages.sh
+
+ci-local: test syntax mcp-build build-packages verify-packages install-dry-run

@@ -1,0 +1,16 @@
+{
+  "name": "heynag-agent-tools",
+  "description": "Claude Code plugins from heyNag agent-tools.",
+  "author": "Nagarjuna Boddu",
+  "repository": "https://github.com/heyNag/agent-tools",
+  "plugins": [
+    {
+      "name": "watch-video",
+      "version": "0.1.0",
+      "description": "Inspect short video clips using transcripts, timestamps, frames, and Groq Whisper fallback.",
+      "path": "./plugins/watch-video",
+      "source": "./plugins/watch-video",
+      "author": "Nagarjuna Boddu"
+    }
+  ]
+}

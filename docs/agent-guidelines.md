@@ -9,6 +9,9 @@ Rules for future AI agents working in this repo:
 - Keep `mcp/watch-video` as a minimal deployable MCP placeholder until real MCP
   tools are explicitly requested.
 - Do not create MCP gateways unless explicitly requested.
+- Edit `packages/` first, then run `make build-packages`.
+- Do not manually edit `plugins/` or `codex/` outputs unless the user explicitly
+  asks for a generated-output-only change.
 - Prefer small, testable changes.
 - Do not over-engineer or add frameworks without a clear need.
 - Do not commit generated `.watch-video/` artifacts.
@@ -29,6 +32,8 @@ Run:
 make test
 make syntax
 make mcp-build
+make build-packages
+make verify-packages
 git status
 ```
 

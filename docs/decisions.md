@@ -45,3 +45,21 @@ Decision: Do not build an MCP gateway.
 
 Reason: The current need is local tooling plus independently deployable MCP
 server shapes. A gateway would add architecture before there is a clear need.
+
+## 2026-06-19: Committed Public Package Outputs
+
+Decision: Commit generated public package outputs under `plugins/` and `codex/`.
+
+Reason: Users and future agents should be able to install Claude Code plugins
+and Codex/generic skills without learning the internal source layout. Source
+still lives under `packages/`; generated outputs are rebuilt with
+`make build-packages` and checked with `make verify-packages`.
+
+## 2026-06-19: Package Manifests Declare Targets
+
+Decision: Future packages use `packages/<name>/tool.json` to declare public
+status, install targets, and MCP presence.
+
+Reason: A small manifest keeps build and verification scripts generic without
+adding a package framework. New packages can follow the same shape when they are
+ready for public distribution.
