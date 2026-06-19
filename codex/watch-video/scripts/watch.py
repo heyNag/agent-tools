@@ -41,7 +41,7 @@ from groq_transcribe import (  # noqa: E402
 
 
 VIDEO_EXTENSIONS = {".mp4", ".mov", ".mkv", ".webm", ".m4v", ".avi", ".wmv", ".flv"}
-REPORT_MODES = {"general", "tutorial", "ui-bug", "notes"}
+REPORT_MODES = ("general", "tutorial", "ui-bug", "notes")
 TIMESTAMP_RE = re.compile(
     r"(?P<start>\d{2}:\d{2}:\d{2}[\.,]\d{3})\s+-->\s+"
     r"(?P<end>\d{2}:\d{2}:\d{2}[\.,]\d{3})"
@@ -716,11 +716,26 @@ def main() -> int:
         default=".watch-video/runs",
         help="Base directory for run artifacts (default: .watch-video/runs)",
     )
-    parser.add_argument("--transcriber", choices=["groq", "openai", "none"], default="groq")
-    parser.add_argument("--mode", choices=sorted(REPORT_MODES), default="general")
-    parser.add_argument("--frames", dest="frames", action="store_true", default=True)
-    parser.add_argument("--no-frames", dest="frames", action="store_false")
-    parser.add_argument("--frame-mode", choices=["auto", "interval"], default="auto")
+    parser.add_argument(
+        "--transcriber",
+        choices=["groq", "openai", "none"],
+        default="groq",
+        help="Transcription fallback provider when captions are missing or weak (default: groq)",
+    )
+    parser.add_argument(
+        "--mode",
+        choices=REPORT_MODES,
+        default="general",
+        help="Report scaffold to generate (default: general)",
+    )
+    parser.add_argument("--frames", dest="frames", action="store_true", default=True, help="Extract frames")
+    parser.add_argument("--no-frames", dest="frames", action="store_false", help="Skip frame extraction")
+    parser.add_argument(
+        "--frame-mode",
+        choices=["auto", "interval"],
+        default="auto",
+        help="Use automatic frame budgeting or a fixed interval (default: auto)",
+    )
     parser.add_argument(
         "--frame-interval",
         type=float,
@@ -728,9 +743,25 @@ def main() -> int:
         help="Seconds between frames in interval mode (default: 5)",
     )
     parser.add_argument("--fps", type=float, help="Explicit FPS override, capped at 2")
-    parser.add_argument("--max-frames", type=int, default=DEFAULT_MAX_FRAMES)
-    parser.add_argument("--frame-width", "--resolution", type=int, default=DEFAULT_WIDTH)
-    parser.add_argument("--frame-format", choices=sorted(FRAME_FORMATS), default="jpeg")
+    parser.add_argument(
+        "--max-frames",
+        type=int,
+        default=DEFAULT_MAX_FRAMES,
+        help="Maximum extracted frames, hard-capped at 100 (default: 80)",
+    )
+    parser.add_argument(
+        "--frame-width",
+        "--resolution",
+        type=int,
+        default=DEFAULT_WIDTH,
+        help="Output frame width in pixels (default: 960)",
+    )
+    parser.add_argument(
+        "--frame-format",
+        choices=sorted(FRAME_FORMATS),
+        default="jpeg",
+        help="Frame image format; use png for UI text (default: jpeg)",
+    )
     parser.add_argument("--cleanup", action="store_true", help="Remove media/audio artifacts after report")
     parser.add_argument(
         "--cleanup-frames",

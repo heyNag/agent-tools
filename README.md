@@ -81,6 +81,11 @@ For UI-heavy recordings, prefer PNG frames:
 python3 packages/watch-video/scripts/watch.py ./bug.mov --mode ui-bug --frame-format png
 ```
 
+Useful flags include `--transcriber groq|openai|none`, `--mode
+general|tutorial|ui-bug|notes`, `--frame-mode auto|interval`, `--fps`,
+`--resolution`, `--frame-format jpeg|png|webp`, `--cleanup`, and
+`--cleanup-frames`.
+
 ## Repo Structure
 
 ```text

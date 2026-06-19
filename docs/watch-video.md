@@ -151,6 +151,16 @@ on the local `ffmpeg` build.
 Use `--cleanup` to remove downloaded media and audio after the report is written.
 Add `--cleanup-frames` only when frame files should also be removed.
 
+Current CLI option surface:
+
+- `--transcriber groq|openai|none`
+- `--mode general|tutorial|ui-bug|notes`
+- `--frame-mode auto|interval`
+- `--fps` for explicit FPS, capped at 2
+- `--resolution` as an alias for `--frame-width`
+- `--frame-format jpeg|png|webp`
+- `--cleanup` and `--cleanup-frames`
+
 ## Future Improvements
 
 - Better visual report summaries.

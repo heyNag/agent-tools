@@ -60,6 +60,16 @@ python3 scripts/watch.py "$URL" --mode tutorial --duration 60 --transcriber groq
 python3 scripts/watch.py "$URL" --transcriber none --frame-mode interval --frame-interval 10
 ```
 
+Common options:
+
+- `--transcriber groq|openai|none`
+- `--mode general|tutorial|ui-bug|notes`
+- `--frame-mode auto|interval`
+- `--fps` for an explicit FPS override, capped at 2
+- `--resolution` as an alias for `--frame-width`
+- `--frame-format jpeg|png|webp`
+- `--cleanup` and `--cleanup-frames`
+
 Outputs are written under `.watch-video/runs/<run-id>/` by default.
 
 ## Files

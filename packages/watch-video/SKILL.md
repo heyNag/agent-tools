@@ -58,6 +58,16 @@ python3 scripts/watch.py "<source>" --mode ui-bug --frame-format png
 python3 scripts/watch.py "<source>" --transcriber none --frames
 ```
 
+Current option surface:
+
+- `--transcriber groq|openai|none`
+- `--mode general|tutorial|ui-bug|notes`
+- `--frame-mode auto|interval`
+- `--fps` for explicit FPS, capped at 2
+- `--resolution` as an alias for `--frame-width`
+- `--frame-format jpeg|png|webp`
+- `--cleanup` and `--cleanup-frames`
+
 The script writes a run directory under `.watch-video/runs/<run-id>/` and prints
 the final `report.md` path. For finite URL ranges, it asks `yt-dlp` for a
 focused download section so short tests do not download whole long videos when
