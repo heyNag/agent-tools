@@ -1,13 +1,17 @@
 .PHONY: test syntax install install-dry-run groq-test mcp-build ci-local
 
 AUDIO ?=
-PYTHON ?= $(if $(wildcard .venv/bin/python),.venv/bin/python,python3)
+PYTHON ?= .venv/bin/python
 
-test:
+$(PYTHON):
+	python3 -m venv .venv
+	$(PYTHON) -m pip install --upgrade pip pytest
+
+test: $(PYTHON)
 	$(PYTHON) -m pytest
 
 syntax:
-	$(PYTHON) -m py_compile packages/watch-video/scripts/*.py
+	python3 -m py_compile packages/watch-video/scripts/*.py
 
 install:
 	./scripts/install-all.sh

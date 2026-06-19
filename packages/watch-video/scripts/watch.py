@@ -252,12 +252,40 @@ def parse_vtt(path: Path) -> list[dict[str, object]]:
             index += 1
         text = clean_caption_text(body)
         if text:
-            if segments and segments[-1]["text"] == text:
-                segments[-1]["end"] = round(end, 3)
-            else:
-                segments.append({"start": round(start, 3), "end": round(end, 3), "text": text})
+            append_caption_segment(segments, start, end, text)
         index += 1
     return segments
+
+
+def append_caption_segment(
+    segments: list[dict[str, object]],
+    start: float,
+    end: float,
+    text: str,
+) -> None:
+    """Append a VTT segment, collapsing rolling auto-caption duplicates."""
+    clean_text = " ".join(text.split())
+    if not clean_text:
+        return
+    rounded_end = round(end, 3)
+
+    if segments:
+        previous = str(segments[-1].get("text") or "")
+        if clean_text == previous:
+            segments[-1]["end"] = rounded_end
+            return
+        if clean_text.startswith(f"{previous} "):
+            segments[-1]["text"] = clean_text
+            segments[-1]["end"] = rounded_end
+            return
+        if previous.startswith(f"{clean_text} "):
+            segments[-1]["end"] = rounded_end
+            return
+        if previous.endswith(f" {clean_text}"):
+            segments[-1]["end"] = rounded_end
+            return
+
+    segments.append({"start": round(start, 3), "end": rounded_end, "text": clean_text})
 
 
 def filter_segments(
@@ -337,11 +365,11 @@ def build_report(
             "",
             "## Artifacts",
             "",
-            "- `metadata.json`",
-            "- `audio.mp3`" if audio_path.exists() else "- `audio.mp3` unavailable",
-            "- `transcript.json`",
-            "- `transcript.md`",
-            "- `frames/`",
+            f"- Metadata JSON: `{run_dir / 'metadata.json'}`",
+            f"- Audio MP3: `{audio_path}`" if audio_path.exists() else "- Audio MP3: unavailable",
+            f"- Transcript JSON: `{run_dir / 'transcript.json'}`",
+            f"- Transcript Markdown: `{run_dir / 'transcript.md'}`",
+            f"- Frames directory: `{run_dir / 'frames'}`",
             "",
         ]
     )

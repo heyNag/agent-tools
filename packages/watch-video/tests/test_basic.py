@@ -109,6 +109,62 @@ next line
     ]
 
 
+def test_parse_vtt_collapses_rolling_auto_captions(tmp_path) -> None:
+    watch = importlib.import_module("watch")
+    vtt = tmp_path / "captions.vtt"
+    vtt.write_text(
+        """WEBVTT
+
+00:00:01.000 --> 00:00:02.000
+Today I'm going to explain the different
+
+00:00:02.000 --> 00:00:03.000
+Today I'm going to explain the different levels of building
+
+00:00:03.000 --> 00:00:04.000
+levels of building
+
+00:00:05.000 --> 00:00:06.000
+Next idea starts here
+""",
+        encoding="utf-8",
+    )
+
+    assert watch.parse_vtt(vtt) == [
+        {
+            "start": 1.0,
+            "end": 4.0,
+            "text": "Today I'm going to explain the different levels of building",
+        },
+        {"start": 5.0, "end": 6.0, "text": "Next idea starts here"},
+    ]
+
+
+def test_build_report_includes_artifact_paths(tmp_path) -> None:
+    watch = importlib.import_module("watch")
+    audio = tmp_path / "audio.mp3"
+    audio.write_bytes(b"audio")
+
+    report = watch.build_report(
+        source="source.mp4",
+        run_dir=tmp_path,
+        metadata={"source_info": {"title": "Demo"}, "probe": {"duration_seconds": 30}},
+        clip_start=0,
+        clip_end=30,
+        audio_path=audio,
+        audio_error=None,
+        transcript_source="native captions",
+        transcript_segments=[{"start": 1, "end": 2, "text": "hello"}],
+        frames=[{"path": str(tmp_path / "frames" / "frame.jpg"), "timestamp": "00:01"}],
+        errors=[],
+    )
+
+    assert f"`{tmp_path / 'transcript.json'}`" in report
+    assert f"`{tmp_path / 'transcript.md'}`" in report
+    assert f"`{tmp_path / 'frames'}`" in report
+    assert str(tmp_path / "frames" / "frame.jpg") in report
+
+
 def test_groq_missing_key_error(monkeypatch, tmp_path) -> None:
     groq = importlib.import_module("groq_transcribe")
     monkeypatch.delenv("GROQ_API_KEY", raising=False)
