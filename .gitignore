@@ -1,5 +1,6 @@
 .DS_Store
 .env
+.env.local
 .watch-video/
 
 # Watch Video run artifacts when custom output dirs are placed in the repo.
