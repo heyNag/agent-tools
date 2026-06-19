@@ -27,6 +27,8 @@ for tool_json in "$ROOT"/packages/*/tool.json; do
   "$ROOT/scripts/build-codex-skill.sh" "$package"
 done
 
+"$ROOT/scripts/build-marketplace.sh"
+
 if [[ "$found" -eq 0 ]]; then
   echo "no package manifests found under packages/*/tool.json"
 fi

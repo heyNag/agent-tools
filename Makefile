@@ -1,4 +1,4 @@
-.PHONY: test syntax install install-dry-run groq-test mcp-build build-claude-plugin build-codex-skill build-packages verify-packages ci-local
+.PHONY: test syntax install install-dry-run groq-test mcp-build build-claude-plugin build-codex-skill build-packages verify-packages verify-generated-clean ci-local
 
 AUDIO ?=
 PYTHON ?= python3
@@ -38,4 +38,16 @@ build-packages:
 verify-packages:
 	./scripts/verify-packages.sh
 
-ci-local: test syntax mcp-build build-packages verify-packages install-dry-run
+verify-generated-clean:
+	@$(MAKE) build-packages >/dev/null
+	@if ! git diff --exit-code -- .claude-plugin/marketplace.json plugins codex; then \
+		echo "generated package outputs are stale; run make build-packages and commit the results" >&2; \
+		exit 1; \
+	fi
+	@if [ -n "$$(git ls-files --others --exclude-standard -- .claude-plugin/marketplace.json plugins codex)" ]; then \
+		git ls-files --others --exclude-standard -- .claude-plugin/marketplace.json plugins codex >&2; \
+		echo "generated package outputs are stale; run make build-packages and commit the results" >&2; \
+		exit 1; \
+	fi
+
+ci-local: test syntax mcp-build build-packages verify-packages verify-generated-clean install-dry-run

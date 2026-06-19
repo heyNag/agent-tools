@@ -26,13 +26,23 @@ Claude Code marketplace install:
 /plugin install watch-video@heynag-agent-tools
 ```
 
+After installing, try:
+
+```text
+/watch-video:watch-video <video-url-or-path>
+```
+
+If your Claude Code version shows a different command name, run `/plugin list`
+or `/plugin details watch-video@heynag-agent-tools`.
+
 Codex or generic skill install:
 
 ```sh
 git clone https://github.com/heyNag/agent-tools.git
+cd agent-tools
 mkdir -p ~/.codex/skills
 rm -rf ~/.codex/skills/watch-video
-cp -R agent-tools/codex/watch-video ~/.codex/skills/watch-video
+cp -R codex/watch-video ~/.codex/skills/watch-video
 ```
 
 Local development install from source:

@@ -46,8 +46,48 @@ copy_dir() {
   local dest_dir="$2"
   mkdir -p "$dest_dir"
   cp -R "$source_dir"/. "$dest_dir"/
-  find "$dest_dir" \( -name "__pycache__" -o -name ".pytest_cache" -o -name ".venv" -o -name "node_modules" -o -name "dist" \) -prune -exec rm -rf {} +
+  prune_generated "$dest_dir"
+}
+
+prune_generated() {
+  local dest_dir="$1"
+  find "$dest_dir" \
+    \( \
+      -name ".env" -o \
+      -name ".env.local" -o \
+      -name ".watch-video" -o \
+      -name "__pycache__" -o \
+      -name ".pytest_cache" -o \
+      -name ".mypy_cache" -o \
+      -name ".ruff_cache" -o \
+      -name ".venv" -o \
+      -name "node_modules" -o \
+      -name "dist" -o \
+      -name "frames" \
+    \) -prune -exec rm -rf {} +
   find "$dest_dir" -name ".DS_Store" -delete
+  find "$dest_dir" \
+    \( \
+      -name "metadata.json" -o \
+      -name "transcript.json" -o \
+      -name "transcript.md" -o \
+      -name "report.md" -o \
+      -name "groq_transcript.raw.json" -o \
+      -iname "frame_*.jpg" -o \
+      -iname "frame_*.jpeg" -o \
+      -iname "frame_*.png" -o \
+      -iname "*.mp3" -o \
+      -iname "*.wav" -o \
+      -iname "*.m4a" -o \
+      -iname "*.aac" -o \
+      -iname "*.mp4" -o \
+      -iname "*.mov" -o \
+      -iname "*.mkv" -o \
+      -iname "*.webm" -o \
+      -iname "*.avi" -o \
+      -iname "*.flv" -o \
+      -iname "*.wmv" \
+    \) -type f -delete
 }
 
 [[ -f "$TOOL_JSON" ]] || fail "missing package manifest: $TOOL_JSON"
@@ -75,5 +115,6 @@ fi
 
 cp "$SRC/README.md" "$OUT/README.md"
 cp "$ROOT/LICENSE" "$OUT/LICENSE"
+prune_generated "$OUT"
 
 echo "built Codex skill: codex/$PACKAGE"

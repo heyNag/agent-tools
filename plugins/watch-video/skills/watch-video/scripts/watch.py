@@ -129,7 +129,24 @@ def compact_info(info_path: Path, fallback_url: str | None = None) -> dict[str, 
     return {key: raw.get(key) for key in keys if raw.get(key) is not None}
 
 
-def download_url(url: str, media_dir: Path) -> tuple[Path, Path | None, dict[str, object]]:
+def download_section_for_args(
+    start: float | None,
+    end: float | None,
+    duration: float | None,
+) -> str | None:
+    """Return a yt-dlp download section for finite focused ranges."""
+    section_start, section_end, _ = resolve_range(start, end, duration)
+    if section_start is None or section_end is None:
+        return None
+    return f"*{format_time(section_start)}-{format_time(section_end)}"
+
+
+def download_url(
+    url: str,
+    media_dir: Path,
+    *,
+    download_section: str | None = None,
+) -> tuple[Path, Path | None, dict[str, object]]:
     require_tool("yt-dlp", "brew install yt-dlp")
     media_dir.mkdir(parents=True, exist_ok=True)
     output_template = str(media_dir / "video.%(ext)s")
@@ -151,11 +168,10 @@ def download_url(url: str, media_dir: Path) -> tuple[Path, Path | None, dict[str
         "--convert-subs",
         "vtt",
         "--no-playlist",
-        "-o",
-        output_template,
-        "--",
-        url,
     ]
+    if download_section is not None:
+        cmd.extend(["--download-sections", download_section])
+    cmd.extend(["-o", output_template, "--", url])
     result = run_command(cmd)
     video = pick_video(media_dir)
     if video is None:
@@ -163,6 +179,8 @@ def download_url(url: str, media_dir: Path) -> tuple[Path, Path | None, dict[str
         raise SystemExit(f"yt-dlp did not produce a video file. detail: {detail[-1200:]}")
 
     info = compact_info(media_dir / "video.info.json", fallback_url=url)
+    if download_section is not None:
+        info["download_section"] = download_section
     if result.returncode != 0:
         info["yt_dlp_warning"] = (result.stderr or result.stdout).strip()[-1200:]
     return video, pick_caption(media_dir), info
@@ -438,6 +456,18 @@ def main() -> int:
     args = parser.parse_args()
 
     try:
+        requested_start = parse_time(args.start)
+        requested_end = parse_time(args.end)
+        requested_duration = parse_time(args.duration)
+        download_section = download_section_for_args(
+            requested_start,
+            requested_end,
+            requested_duration,
+        )
+    except ValueError as exc:
+        raise SystemExit(str(exc)) from exc
+
+    try:
         run_dir = create_run_dir(args.out_dir, args.source)
     except RuntimeError as exc:
         raise SystemExit(str(exc)) from exc
@@ -448,7 +478,11 @@ def main() -> int:
 
     if is_url(args.source):
         print("[watch-video] downloading source with yt-dlp", file=sys.stderr)
-        video_path, caption_path, source_info = download_url(args.source, media_dir)
+        video_path, caption_path, source_info = download_url(
+            args.source,
+            media_dir,
+            download_section=download_section,
+        )
     else:
         print("[watch-video] using local source", file=sys.stderr)
         video_path, caption_path, source_info = resolve_local(args.source)
@@ -461,9 +495,9 @@ def main() -> int:
     )
     try:
         clip_start, clip_end, clip_duration = resolve_range(
-            parse_time(args.start),
-            parse_time(args.end),
-            parse_time(args.duration),
+            requested_start,
+            requested_end,
+            requested_duration,
             total_duration=total_duration,
         )
     except ValueError as exc:

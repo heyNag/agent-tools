@@ -40,6 +40,14 @@ plugins = data.get("plugins")
 if not isinstance(plugins, list) or not plugins:
     errors.append("marketplace plugins must be a non-empty array")
 
+expected = {}
+for tool_path in sorted((root / "packages").glob("*/tool.json")):
+    tool = json.loads(tool_path.read_text(encoding="utf-8"))
+    targets = tool.get("targets") or []
+    if tool.get("public") is True and "claude" in targets:
+        name = tool.get("name") or tool_path.parent.name
+        expected[name] = tool_path
+
 seen = set()
 for index, plugin in enumerate(plugins or []):
     if not isinstance(plugin, dict):
@@ -52,12 +60,22 @@ for index, plugin in enumerate(plugins or []):
     if name in seen:
         errors.append(f"duplicate plugin name: {name}")
     seen.add(name)
+    if name not in expected:
+        errors.append(f"marketplace plugin has no public Claude package: {name}")
 
     source = plugin.get("source")
     if not isinstance(source, str) or not source.startswith("./"):
         errors.append(f"plugins[{index}].source must be a relative ./ path")
     if "path" in plugin:
         errors.append(f"plugins[{index}].path is redundant; use source only")
+    if isinstance(source, str):
+        if ".." in pathlib.PurePosixPath(source).parts:
+            errors.append(f"plugins[{index}].source must not contain '..'")
+        if source != f"./plugins/{name}":
+            errors.append(f"plugins[{index}].source should be ./plugins/{name}")
+        source_dir = root / source.removeprefix("./")
+        if not source_dir.is_dir():
+            errors.append(f"plugins[{index}].source directory is missing: {source}")
 
     author = plugin.get("author")
     if not isinstance(author, dict) or not isinstance(author.get("name"), str) or not author["name"]:
@@ -75,6 +93,10 @@ for index, plugin in enumerate(plugins or []):
                 errors.append(f"plugins[{index}].name does not match {plugin_json}")
             if manifest.get("version") != plugin.get("version"):
                 errors.append(f"plugins[{index}].version does not match {plugin_json}")
+
+missing = sorted(set(expected) - seen)
+for name in missing:
+    errors.append(f"public Claude package missing from marketplace: {name}")
 
 if errors:
     for error in errors:
@@ -176,6 +198,47 @@ scan_output() {
     echo "$hits" >&2
     fail "generated package contains forbidden files under ${output_dir#$ROOT/}"
   fi
+
+  python3 - "$output_dir" "$ROOT" <<'PY'
+import pathlib
+import re
+import sys
+
+output_dir = pathlib.Path(sys.argv[1])
+root = pathlib.Path(sys.argv[2])
+secret_patterns = [
+    re.compile(r"gsk_[A-Za-z0-9_-]{8,}"),
+    re.compile(r"sk-[A-Za-z0-9_-]{8,}"),
+]
+assignment = re.compile(r"\bGROQ_API_KEY\s*=\s*['\"]?([^'\"\s`]+)")
+safe_values = {"", "...", "your-key", "your_groq_api_key", "<key>", "<your-key>"}
+hits = []
+
+for path in sorted(output_dir.rglob("*")):
+    if not path.is_file():
+        continue
+    try:
+        text = path.read_text(encoding="utf-8")
+    except UnicodeDecodeError:
+        continue
+    rel = path.relative_to(root)
+    for line_no, line in enumerate(text.splitlines(), start=1):
+        if ".env.local" in line:
+            hits.append(f"{rel}:{line_no}: .env.local")
+        for pattern in secret_patterns:
+            if pattern.search(line):
+                hits.append(f"{rel}:{line_no}: {pattern.pattern}")
+        match = assignment.search(line)
+        if match:
+            value = match.group(1).strip()
+            if value not in safe_values and not value.startswith("$"):
+                hits.append(f"{rel}:{line_no}: GROQ_API_KEY assignment")
+
+if hits:
+    for hit in hits:
+        print(hit, file=sys.stderr)
+    raise SystemExit(1)
+PY
 }
 
 check_file "$ROOT/.claude-plugin/marketplace.json"

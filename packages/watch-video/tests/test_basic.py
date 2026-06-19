@@ -83,6 +83,18 @@ class WatchVideoBasicTests(unittest.TestCase):
 
             self.assertEqual(watch.pick_caption(tmp_path).name, "video.en.vtt")
 
+    def test_download_section_for_finite_ranges(self) -> None:
+        watch = importlib.import_module("watch")
+
+        self.assertEqual(watch.download_section_for_args(None, None, 30), "*00:00-00:30")
+        self.assertEqual(watch.download_section_for_args(60, 90, None), "*01:00-01:30")
+        self.assertEqual(watch.download_section_for_args(60, None, 30), "*01:00-01:30")
+        self.assertEqual(watch.download_section_for_args(None, 90, None), "*00:00-01:30")
+        self.assertIsNone(watch.download_section_for_args(60, None, None))
+        self.assertIsNone(watch.download_section_for_args(None, None, None))
+        with self.assertRaisesRegex(ValueError, "either --end or --duration"):
+            watch.download_section_for_args(0, 10, 5)
+
     def test_segments_from_response_offsets(self) -> None:
         groq = importlib.import_module("groq_transcribe")
 

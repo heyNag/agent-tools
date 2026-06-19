@@ -13,18 +13,30 @@ short clips, tutorials, demos, screen recordings, and UI bug videos.
 /plugin install watch-video@heynag-agent-tools
 ```
 
+After installing, try:
+
+```text
+/watch-video:watch-video <video-url-or-path>
+```
+
+If your Claude Code version shows a different command name, run `/plugin list`
+or `/plugin details watch-video@heynag-agent-tools`.
+
 ## Install For Codex Or Generic Skills
 
 ```sh
 git clone https://github.com/heyNag/agent-tools.git
+cd agent-tools
 mkdir -p ~/.codex/skills
 rm -rf ~/.codex/skills/watch-video
-cp -R agent-tools/codex/watch-video ~/.codex/skills/watch-video
+cp -R codex/watch-video ~/.codex/skills/watch-video
 ```
 
 ## Local Development Install
 
 ```sh
+git clone https://github.com/heyNag/agent-tools.git
+cd agent-tools
 ./scripts/install-all.sh
 ```
 
@@ -66,6 +78,9 @@ scripts/              build, install, test, and helper scripts
 .github/workflows/    CI
 ```
 
+`plugins/` and `codex/` are generated from `packages/`, but they are committed as
+public install targets.
+
 Future tools should follow this pattern:
 
 - `packages/<name>/tool.json`
@@ -74,6 +89,15 @@ Future tools should follow this pattern:
 - `mcp/<name>` only when an MCP server is needed
 
 There is no MCP gateway for now.
+
+## Troubleshooting
+
+If marketplace install fails, run these from the repo root:
+
+```sh
+claude plugin validate .
+claude plugin validate plugins/watch-video
+```
 
 ## Docs
 
@@ -96,4 +120,5 @@ make syntax
 make mcp-build
 make build-packages
 make verify-packages
+make verify-generated-clean
 ```

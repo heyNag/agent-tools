@@ -32,3 +32,6 @@ jobs:
 
       - name: Verify public packages
         run: make verify-packages
+
+      - name: Verify generated outputs are committed
+        run: make verify-generated-clean

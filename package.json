@@ -2,13 +2,14 @@
   "name": "agent-tools",
   "version": "0.1.0",
   "private": true,
-  "description": "Personal agent tooling workspace.",
+  "description": "Public agent tooling workspace for skills, commands, plugins, and future MCP servers.",
   "scripts": {
     "test": "python3 -m unittest discover -s packages/watch-video/tests -p 'test_*.py'",
     "syntax": "python3 -m py_compile packages/watch-video/scripts/*.py && bash -n scripts/*.sh",
     "build:mcp": "npm --prefix mcp/watch-video run build",
     "build:packages": "./scripts/build-packages.sh",
     "verify:packages": "./scripts/verify-packages.sh",
+    "verify:generated": "make verify-generated-clean",
     "install:dry-run": "DRY_RUN=1 ./scripts/install-all.sh"
   },
   "license": "MIT"

@@ -15,6 +15,10 @@ In the `agent-tools` repo, source lives under `packages/watch-video`. Public
 install targets are generated from that source into `plugins/watch-video` and
 `codex/watch-video`.
 
+Claude Code users install from the marketplace package in `plugins/watch-video`.
+Codex and generic skill users can copy `codex/watch-video` into their local
+skills directory.
+
 ## Requirements
 
 ```sh
@@ -31,7 +35,7 @@ export GROQ_MODEL="whisper-large-v3-turbo"
 ## Quickstart
 
 ```sh
-python3 scripts/watch.py "https://www.youtube.com/watch?v=dQw4w9WgXcQ" \
+python3 scripts/watch.py "https://www.youtube.com/watch?v=DTCyvo6cC54" \
   --duration 30 \
   --frames \
   --frame-interval 5

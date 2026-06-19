@@ -63,6 +63,8 @@ workspace:
 - Tests cover importability, time parsing, range normalization, frame count caps,
   run directory collision handling, transcript formatting, VTT parsing, rolling
   auto-caption cleanup, report artifact paths, and missing Groq key errors.
+- Public package distribution now exists under `plugins/watch-video`,
+  `codex/watch-video`, and `.claude-plugin/marketplace.json`.
 - CI is offline and does not require secrets.
 - Docs already explain architecture, security, roadmap, local live testing, and
   MCP placeholder direction.
@@ -98,8 +100,9 @@ The following gaps are worth considering as future improvements:
 - Report quality. The current report is readable and artifact-oriented, but it
   could eventually include richer visual summaries, key frames, or more explicit
   "what to inspect next" sections.
-- Plugin packaging. The current Claude plugin metadata is intentionally minimal.
-  The reference has fuller marketplace-style packaging and hooks.
+- Release automation. Public Claude and Codex package outputs now exist, but
+  richer release tagging, changelog generation, and marketplace promotion remain
+  future work.
 
 ## Intentionally Deferred
 
@@ -112,8 +115,6 @@ These reference features should not be copied into `agent-tools` right now:
   decision; other providers can be added later if needed.
 - Session hooks that run on every Claude startup. They may be useful later, but
   install behavior should stay predictable and tool-neutral for now.
-- Marketplace/release packaging. Useful eventually, but not needed for the
-  personal workspace phase.
 - Any MCP gateway. Real MCP tools can be added under `mcp/watch-video` later,
   but a gateway is explicitly not planned now.
 

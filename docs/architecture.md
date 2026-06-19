@@ -44,6 +44,7 @@ public install targets so users and agents do not need to understand the source
 workspace layout.
 
 ```text
+.claude-plugin/marketplace.json  generated Claude Code marketplace catalog
 plugins/<name>        Claude Code plugin package
 codex/<name>          Codex/generic skill package
 ```
@@ -54,6 +55,7 @@ Do not manually edit generated public outputs during normal development. Edit
 ```sh
 make build-packages
 make verify-packages
+make verify-generated-clean
 ```
 
 Future packages should follow the same manifest pattern:

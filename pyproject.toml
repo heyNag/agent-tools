@@ -1,7 +1,7 @@
 [project]
 name = "agent-tools"
 version = "0.1.0"
-description = "Personal agent tooling workspace."
+description = "Public agent tooling workspace for skills, commands, plugins, and future MCP servers."
 requires-python = ">=3.11"
 license = { text = "MIT" }
 authors = [

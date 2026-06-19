@@ -12,6 +12,8 @@ Rules for future AI agents working in this repo:
 - Edit `packages/` first, then run `make build-packages`.
 - Do not manually edit `plugins/` or `codex/` outputs unless the user explicitly
   asks for a generated-output-only change.
+- Use `make verify-generated-clean` to confirm committed public outputs match
+  package source and manifests.
 - Prefer small, testable changes.
 - Do not over-engineer or add frameworks without a clear need.
 - Do not commit generated `.watch-video/` artifacts.
@@ -34,6 +36,7 @@ make syntax
 make mcp-build
 make build-packages
 make verify-packages
+make verify-generated-clean
 git status
 ```
 
