@@ -10,7 +10,7 @@ short clips, tutorials, demos, screen recordings, and UI bug videos.
 
 ```text
 /plugin marketplace add heyNag/agent-tools
-/plugin install watch-video@heynag-agent-tools
+/plugin install watch-video@agent-tools
 ```
 
 After installing, try:
@@ -20,7 +20,7 @@ After installing, try:
 ```
 
 If your Claude Code version shows a different command name, run `/plugin list`
-or `/plugin details watch-video@heynag-agent-tools`.
+or `/plugin details watch-video@agent-tools`.
 
 ## Install For Codex Or Generic Skills
 

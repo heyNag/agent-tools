@@ -1,6 +1,6 @@
 {
-  "name": "heynag-agent-tools",
-  "description": "Claude Code plugins from heyNag agent-tools.",
+  "name": "agent-tools",
+  "description": "Claude Code plugins from agent-tools.",
   "owner": {
     "name": "Nagarjuna Boddu"
   },

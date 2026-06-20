@@ -63,8 +63,8 @@ for tool_path in sorted((ROOT / "packages").glob("*/tool.json")):
     )
 
 marketplace = {
-    "name": "heynag-agent-tools",
-    "description": "Claude Code plugins from heyNag agent-tools.",
+    "name": "agent-tools",
+    "description": "Claude Code plugins from agent-tools.",
     "owner": DEFAULT_AUTHOR,
     "plugins": plugins,
 }
