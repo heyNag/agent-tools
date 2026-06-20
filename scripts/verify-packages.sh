@@ -263,6 +263,7 @@ for tool_json in "$ROOT"/packages/*/tool.json; do
   if [[ "$(json_has_target "$tool_json" claude)" == "true" ]]; then
     plugin_dir="$ROOT/plugins/$package"
     check_file "$plugin_dir/.claude-plugin/plugin.json"
+    check_file "$plugin_dir/GENERATED.md"
     check_file "$plugin_dir/skills/$package/SKILL.md"
     check_file "$plugin_dir/README.md"
     check_file "$plugin_dir/LICENSE"
@@ -290,6 +291,7 @@ for tool_json in "$ROOT"/packages/*/tool.json; do
 
   if [[ "$(json_has_target "$tool_json" codex)" == "true" ]]; then
     codex_dir="$ROOT/codex/$package"
+    check_file "$codex_dir/GENERATED.md"
     check_file "$codex_dir/SKILL.md"
     check_file "$codex_dir/README.md"
     check_file "$codex_dir/LICENSE"

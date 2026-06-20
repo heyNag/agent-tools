@@ -57,6 +57,7 @@ Do not manually edit generated public outputs during normal development. Edit
 ```sh
 make build-packages
 make verify-packages
+make audit-generated
 make verify-generated-clean
 ```
 
@@ -108,3 +109,22 @@ Install scripts copy repo source into local Claude/Codex folders. Those installe
 copies are runtime copies, not source of truth. Do not manually edit installed
 copies and treat them as canonical. Change the repo source and rerun the install
 script instead.
+
+## Edit Map
+
+Use this map when deciding where a change belongs:
+
+```text
+Edit: packages/watch-video/             source package
+Edit: mcp/watch-video/                  MCP placeholder source
+Edit: scripts/                          build, install, and verification helpers
+Edit: docs/                             project memory and guidance
+Generated: plugins/watch-video/         from packages/watch-video/
+Generated: codex/watch-video/           from packages/watch-video/
+Generated: .claude-plugin/              from packages/*/tool.json and plugin metadata
+```
+
+Generated directories are committed for public installation, but they are
+downstream copies. Each generated package contains a `GENERATED.md` marker.
+The source package contains `SOURCE.md`. Generated markers list the exact source
+paths to edit for each generated file or directory.

@@ -149,6 +149,35 @@ else
 fi
 cp "$SRC/README.md" "$OUT/README.md"
 cp "$ROOT/LICENSE" "$OUT/LICENSE"
+cat > "$OUT/GENERATED.md" <<EOF
+# Generated Claude Code Package
+
+This directory is generated from:
+
+\`\`\`text
+packages/$PACKAGE
+\`\`\`
+
+Do not edit this directory directly during normal development.
+
+Edit these source paths instead:
+
+~~~text
+plugins/$PACKAGE/README.md                         <- packages/$PACKAGE/README.md
+plugins/$PACKAGE/.claude-plugin/plugin.json        <- packages/$PACKAGE/plugin/plugin.json
+plugins/$PACKAGE/skills/$PACKAGE/SKILL.md          <- packages/$PACKAGE/SKILL.md
+plugins/$PACKAGE/skills/$PACKAGE/scripts/          <- packages/$PACKAGE/scripts/
+plugins/$PACKAGE/commands/                         <- packages/$PACKAGE/commands/
+plugins/$PACKAGE/LICENSE                           <- LICENSE
+~~~
+
+After editing source:
+
+1. Edit \`packages/$PACKAGE\`.
+2. Run \`make build-packages\`.
+3. Run \`make verify-generated-clean\`.
+4. Commit both source and regenerated output changes.
+EOF
 prune_generated "$OUT"
 
 echo "built Claude plugin: plugins/$PACKAGE"

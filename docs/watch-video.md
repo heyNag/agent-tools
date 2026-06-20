@@ -10,12 +10,20 @@ Source of truth:
 packages/watch-video
 ```
 
+This source package has a `SOURCE.md` marker.
+
 Public install targets:
 
 ```text
 plugins/watch-video
 codex/watch-video
 ```
+
+These public install targets are generated from `packages/watch-video` and have
+`GENERATED.md` markers. Edit the source package first, then run
+`make build-packages`. The generated markers list exact source paths, such as
+`plugins/watch-video/skills/watch-video/scripts/` mapping back to
+`packages/watch-video/scripts/`.
 
 ## Install
 

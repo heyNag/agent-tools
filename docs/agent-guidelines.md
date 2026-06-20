@@ -12,6 +12,8 @@ Rules for future AI agents working in this repo:
 - Edit `packages/` first, then run `make build-packages`.
 - Do not manually edit `plugins/` or `codex/` outputs unless the user explicitly
   asks for a generated-output-only change.
+- Treat `packages/watch-video/SOURCE.md` and generated `GENERATED.md` files as
+  the ownership markers.
 - Use `make verify-generated-clean` to confirm committed public outputs match
   package source and manifests.
 - Use `make doctor` before live `watch-video` debugging when local dependencies
@@ -39,6 +41,7 @@ make syntax
 make mcp-build
 make build-packages
 make verify-packages
+make audit-generated
 make verify-generated-clean
 git status
 ```

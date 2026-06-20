@@ -117,6 +117,33 @@ fi
 
 cp "$SRC/README.md" "$OUT/README.md"
 cp "$ROOT/LICENSE" "$OUT/LICENSE"
+cat > "$OUT/GENERATED.md" <<EOF
+# Generated Codex Skill Package
+
+This directory is generated from:
+
+\`\`\`text
+packages/$PACKAGE
+\`\`\`
+
+Do not edit this directory directly during normal development.
+
+Edit these source paths instead:
+
+~~~text
+codex/$PACKAGE/README.md      <- packages/$PACKAGE/README.md
+codex/$PACKAGE/SKILL.md       <- packages/$PACKAGE/SKILL.md
+codex/$PACKAGE/scripts/       <- packages/$PACKAGE/scripts/
+codex/$PACKAGE/LICENSE        <- LICENSE
+~~~
+
+After editing source:
+
+1. Edit \`packages/$PACKAGE\`.
+2. Run \`make build-packages\`.
+3. Run \`make verify-generated-clean\`.
+4. Commit both source and regenerated output changes.
+EOF
 prune_generated "$OUT"
 
 echo "built Codex skill: codex/$PACKAGE"

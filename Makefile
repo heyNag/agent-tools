@@ -1,4 +1,4 @@
-.PHONY: test syntax doctor install install-dry-run groq-test mcp-build build-claude-plugin build-codex-skill build-packages verify-packages verify-generated-clean ci-local
+.PHONY: test syntax doctor install install-dry-run groq-test mcp-build build-claude-plugin build-codex-skill build-packages verify-packages audit-generated verify-generated-clean ci-local
 
 AUDIO ?=
 PYTHON ?= python3
@@ -41,6 +41,9 @@ build-packages:
 verify-packages:
 	./scripts/verify-packages.sh
 
+audit-generated:
+	./scripts/audit-generated.sh
+
 verify-generated-clean:
 	@$(MAKE) build-packages >/dev/null
 	@if ! git diff --exit-code -- .claude-plugin/marketplace.json plugins codex; then \
@@ -53,4 +56,4 @@ verify-generated-clean:
 		exit 1; \
 	fi
 
-ci-local: test syntax mcp-build build-packages verify-packages verify-generated-clean install-dry-run
+ci-local: test syntax mcp-build build-packages verify-packages audit-generated verify-generated-clean install-dry-run

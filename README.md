@@ -101,6 +101,33 @@ scripts/              build, install, test, and helper scripts
 `plugins/` and `codex/` are generated from `packages/`, but they are committed as
 public install targets.
 
+## What To Edit
+
+Edit source files here:
+
+```text
+packages/watch-video/
+mcp/watch-video/
+scripts/
+docs/
+```
+
+Do not edit generated public install copies directly:
+
+```text
+plugins/watch-video/              generated from packages/watch-video/
+codex/watch-video/                generated from packages/watch-video/
+.claude-plugin/marketplace.json   generated from packages/*/tool.json and plugin metadata
+```
+
+After changing `packages/watch-video`, run:
+
+```sh
+make build-packages
+make audit-generated
+make verify-generated-clean
+```
+
 Future tools should follow this pattern:
 
 - `packages/<name>/tool.json`
@@ -140,5 +167,6 @@ make syntax
 make mcp-build
 make build-packages
 make verify-packages
+make audit-generated
 make verify-generated-clean
 ```
