@@ -76,6 +76,7 @@ prune_generated() {
       -iname "frame_*.jpg" -o \
       -iname "frame_*.jpeg" -o \
       -iname "frame_*.png" -o \
+      -iname "frame_*.webp" -o \
       -iname "*.mp3" -o \
       -iname "*.wav" -o \
       -iname "*.m4a" -o \
@@ -84,6 +85,7 @@ prune_generated() {
       -iname "*.mov" -o \
       -iname "*.mkv" -o \
       -iname "*.webm" -o \
+      -iname "*.webp" -o \
       -iname "*.avi" -o \
       -iname "*.flv" -o \
       -iname "*.wmv" \

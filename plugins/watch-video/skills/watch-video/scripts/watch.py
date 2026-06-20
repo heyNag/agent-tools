@@ -42,6 +42,7 @@ from groq_transcribe import (  # noqa: E402
 
 VIDEO_EXTENSIONS = {".mp4", ".mov", ".mkv", ".webm", ".m4v", ".avi", ".wmv", ".flv"}
 REPORT_MODES = ("general", "tutorial", "ui-bug", "notes")
+SUBTITLE_LANGS = "en,en-orig,en-US,en-GB,en.*,all,-live_chat"
 TIMESTAMP_RE = re.compile(
     r"(?P<start>\d{2}:\d{2}:\d{2}[\.,]\d{3})\s+-->\s+"
     r"(?P<end>\d{2}:\d{2}:\d{2}[\.,]\d{3})"
@@ -246,7 +247,7 @@ def download_url(
         "--write-subs",
         "--write-auto-subs",
         "--sub-langs",
-        "en,en-US,en-GB,en-orig",
+        SUBTITLE_LANGS,
         "--sub-format",
         "vtt",
         "--convert-subs",

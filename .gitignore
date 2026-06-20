@@ -21,6 +21,10 @@
 *.mov
 *.mkv
 *.webm
+*.webp
+*.avi
+*.flv
+*.wmv
 
 __pycache__/
 *.py[cod]

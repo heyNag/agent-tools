@@ -44,6 +44,8 @@ verbose JSON segment timestamps.
 
 ## Quickstart
 
+From this package directory:
+
 ```sh
 python3 scripts/watch.py "https://www.youtube.com/watch?v=DTCyvo6cC54" \
   --duration 30 \

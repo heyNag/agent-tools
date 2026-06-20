@@ -180,6 +180,7 @@ scan_output() {
         -iname "frame_*.jpg" -o \
         -iname "frame_*.jpeg" -o \
         -iname "frame_*.png" -o \
+        -iname "frame_*.webp" -o \
         -iname "*.mp3" -o \
         -iname "*.wav" -o \
         -iname "*.m4a" -o \
@@ -188,6 +189,7 @@ scan_output() {
         -iname "*.mov" -o \
         -iname "*.mkv" -o \
         -iname "*.webm" -o \
+        -iname "*.webp" -o \
         -iname "*.avi" -o \
         -iname "*.flv" -o \
         -iname "*.wmv" \
@@ -210,7 +212,7 @@ secret_patterns = [
     re.compile(r"gsk_[A-Za-z0-9_-]{8,}"),
     re.compile(r"sk-[A-Za-z0-9_-]{8,}"),
 ]
-assignment = re.compile(r"\bGROQ_API_KEY\s*=\s*['\"]?([^'\"\s`]+)")
+assignment = re.compile(r"\b(?:GROQ_API_KEY|OPENAI_API_KEY)\s*=\s*['\"]?([^'\"\s`]+)")
 safe_values = {"", "...", "your-key", "your_groq_api_key", "<key>", "<your-key>"}
 hits = []
 
@@ -232,7 +234,7 @@ for path in sorted(output_dir.rglob("*")):
         if match:
             value = match.group(1).strip()
             if value not in safe_values and not value.startswith("$"):
-                hits.append(f"{rel}:{line_no}: GROQ_API_KEY assignment")
+                hits.append(f"{rel}:{line_no}: API key assignment")
 
 if hits:
     for hit in hits:

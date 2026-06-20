@@ -143,6 +143,13 @@ class WatchVideoBasicTests(unittest.TestCase):
 
             self.assertEqual(watch.pick_caption(tmp_path).name, "video.en.vtt")
 
+    def test_subtitle_language_selector_allows_fallback_tracks(self) -> None:
+        watch = importlib.import_module("watch")
+
+        self.assertIn("en", watch.SUBTITLE_LANGS)
+        self.assertIn("all", watch.SUBTITLE_LANGS)
+        self.assertIn("-live_chat", watch.SUBTITLE_LANGS)
+
     def test_pick_caption_prefers_english_even_when_auto(self) -> None:
         watch = importlib.import_module("watch")
 
