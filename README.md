@@ -128,10 +128,9 @@ Future agents should read `docs/README.md`, `docs/architecture.md`, and
 
 ## Security
 
-Do not commit real API keys, `.env.local`, `.watch-video/` artifacts, legacy
-`.watch-video/` artifacts, media files, transcripts, frames, caches, or local
-build outputs. Keep CI no-secret and free of live Groq/video/Claude
-requirements. See [docs/security.md](docs/security.md).
+Do not commit real API keys, `.env.local`, `.watch-video/` artifacts, media
+files, transcripts, frames, caches, or local build outputs. Keep CI no-secret and
+free of live Groq/video/Claude requirements. See [docs/security.md](docs/security.md).
 
 ## Checks
 
