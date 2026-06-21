@@ -60,15 +60,18 @@ jobs:
       - name: Audit generated source mapping
         run: make audit-generated
 
+      - name: Stage expected release outputs
+        run: git add "packages/${{ inputs.skill }}/plugin/plugin.json" generated .claude-plugin
+
       - name: Verify generated outputs are clean
         run: make verify-generated-clean
 
       - name: Check whitespace
-        run: git diff --check
+        run: git diff --cached --check
 
       - name: Commit release
         run: |
-          if git diff --quiet; then
+          if git diff --cached --quiet; then
             echo "No release changes to commit."
             exit 1
           fi
