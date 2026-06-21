@@ -20,7 +20,7 @@ Choose the path that matches what you are trying to do:
 - Understand source versus generated files: read
   [docs/architecture.md](docs/architecture.md) and
   [docs/distribution-targets.md](docs/distribution-targets.md).
-- Install through Skillshare's web UI: read
+- Optional Skillshare hub install, if you already use Skillshare: read
   [docs/skillshare.md](docs/skillshare.md).
 - Add a new skill: follow
   [docs/adding-a-skill.md](docs/adding-a-skill.md) step by step.
@@ -68,17 +68,19 @@ rm -rf ~/.codex/skills/x-bookmarks
 cp -R generated/codex/skills/x-bookmarks ~/.codex/skills/x-bookmarks
 ```
 
-## Install With Skillshare
+## Optional: Skillshare
 
-Skillshare users should prefer the curated hub index so the web UI shows only
-canonical source packages:
+If you already use Skillshare, this repo publishes a curated hub index so the
+web UI shows only canonical source packages:
 
 ```text
 https://raw.githubusercontent.com/heyNag/agent-tools/main/skillshare-hub.json
 ```
 
 In the Skillshare web UI, use `Search > Hub`, add/select that hub URL, then
-install `watch-video`, `codex-reset-credit`, or `x-bookmarks`.
+install `watch-video`, `codex-reset-credit`, or `x-bookmarks`. This is an
+optional install path; the main public install paths are Claude Code, Codex,
+Claude Desktop, and OpenCode.
 
 CLI users can save the hub once:
 
@@ -101,8 +103,7 @@ Avoid installing from `generated/` through Skillshare. Those folders are
 target-specific outputs for Claude Code, Claude Desktop, Codex, and OpenCode.
 The root `.skillignore` hides `generated/` during Skillshare repo discovery;
 GitHub Code Search may still show generated copies because it scans every
-committed `SKILL.md`. The hub is the clean public Skillshare entrypoint because
-it lists only canonical package source paths.
+committed `SKILL.md`.
 
 ## Install For Claude Desktop Or Claude.ai Skills
 
@@ -235,7 +236,7 @@ python3 packages/x-bookmarks/scripts/x_api_auth.py --status
 packages/             source of truth for tools
 generated/            generated Claude/Codex/OpenCode public install packages
 .claude-plugin/       generated Claude Code marketplace catalog
-skillshare-hub.json   generated Skillshare hub index for canonical package install
+skillshare-hub.json   optional generated Skillshare hub index
 mcp/                  future deployable MCP servers
 docs/                 project memory and agent orientation
 scripts/              build, install, test, and helper scripts

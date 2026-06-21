@@ -36,14 +36,14 @@ are rebuilt from scratch with `make rebuild-generated` and checked with
 `make verify-skill-metadata`, `make verify-packages`, `make audit-generated`, and
 `make verify-generated-clean`.
 
-## Skillshare Discovery
+## Optional Skillshare Discovery
 
 Keep Skillshare discovery source-first. The root `.skillignore` hides
 `generated/` during Skillshare install/discovery, while `skillshare-hub.json`
 provides a curated Hub index that lists only canonical `packages/<name>` source
 paths. GitHub Code Search may still show every committed `SKILL.md`; the repo's
-recommended Skillshare path is Hub mode or direct `heyNag/agent-tools/packages/<name>`
-install.
+optional Skillshare path is Hub mode or direct `heyNag/agent-tools/packages/<name>`
+install for users who already use Skillshare.
 
 Skillshare-facing names, descriptions, and tags must be present in canonical
 `packages/<name>/SKILL.md` frontmatter. `tool.json` still declares build

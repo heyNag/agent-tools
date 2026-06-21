@@ -88,8 +88,8 @@ cp -R generated/agent-skills/x-bookmarks ~/.config/opencode/skills/x-bookmarks
 The same portable folders can also be copied to agent-compatible locations such
 as `.agents/skills/<name>` or `~/.agents/skills/<name>`.
 
-Skillshare is an installer and sync manager rather than a separate runtime
-target. Use Hub mode with:
+Skillshare is optional. It is an installer and sync manager rather than a
+separate runtime target. If you already use it, use Hub mode with:
 
 ```text
 https://raw.githubusercontent.com/heyNag/agent-tools/main/skillshare-hub.json

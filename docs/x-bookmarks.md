@@ -82,7 +82,7 @@ rm -rf ~/.config/opencode/skills/x-bookmarks
 cp -R generated/agent-skills/x-bookmarks ~/.config/opencode/skills/x-bookmarks
 ```
 
-Skillshare install:
+Optional Skillshare install, if you already use Skillshare:
 
 ```sh
 skillshare install heyNag/agent-tools/packages/x-bookmarks --track

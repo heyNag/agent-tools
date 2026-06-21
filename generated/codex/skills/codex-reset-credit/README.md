@@ -39,7 +39,7 @@ generated/codex/skills/codex-reset-credit
 generated/agent-skills/codex-reset-credit
 ```
 
-Skillshare users should install from the hub or direct source package path:
+Optional if you already use Skillshare:
 
 ```sh
 skillshare install heyNag/agent-tools/packages/codex-reset-credit --track

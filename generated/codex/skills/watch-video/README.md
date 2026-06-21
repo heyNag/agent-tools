@@ -30,7 +30,7 @@ Desktop / claude.ai custom skill users can ZIP
 `generated/claude/custom-skills/watch-video`. OpenCode and generic Agent Skills
 users can use `generated/agent-skills/watch-video`.
 
-Skillshare users should install from the hub or direct source package path:
+Optional if you already use Skillshare:
 
 ```sh
 skillshare install heyNag/agent-tools/packages/watch-video --track

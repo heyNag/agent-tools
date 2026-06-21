@@ -56,7 +56,7 @@ flowchart TD
   B --> CX["generated/codex/skills/&lt;name&gt;<br/>Codex skill"]
   B --> AG["generated/agent-skills/&lt;name&gt;<br/>OpenCode / generic Agent Skill"]
   B --> MP[".claude-plugin/marketplace.json<br/>Claude Code marketplace catalog"]
-  B --> SH["skillshare-hub.json<br/>Skillshare hub index"]
+  B --> SH["skillshare-hub.json<br/>optional Skillshare hub index"]
 
   CC --> V["make verify-skill-metadata<br/>make verify-packages<br/>make audit-generated<br/>make verify-generated-clean"]
   CD --> V
@@ -139,7 +139,7 @@ Optional directories are present only when the source package has them. The
 `GENERATED.md` file inside each target lists the exact source paths that
 produced that target.
 
-Skillshare hub:
+Optional Skillshare hub:
 
 ```text
 skillshare-hub.json
@@ -147,8 +147,8 @@ skillshare-hub.json
 
 This root file is generated from `packages/*/SKILL.md`,
 `packages/*/tool.json`, and `packages/*/plugin/plugin.json`. It is not a
-target package. It is a curated index for Skillshare Hub search, and each entry
-points at the canonical source package path:
+target package. It is a curated index for optional Skillshare Hub search, and
+each entry points at the canonical source package path:
 
 ```text
 heyNag/agent-tools/packages/<name>

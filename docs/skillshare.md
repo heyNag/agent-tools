@@ -1,11 +1,15 @@
-# Skillshare
+# Optional Skillshare Support
+
+Skillshare support exists for people who already use Skillshare. It is not the
+primary public install path for this repo. The main install paths are Claude
+Code, Codex, Claude Desktop / claude.ai custom skills, and OpenCode.
 
 Skillshare can install skills from this repo, but it sees source and generated
 files differently depending on the UI mode.
 
-## Recommended Install Path
+## Optional Install Path
 
-Use the curated hub index:
+If you use Skillshare, prefer the curated hub index:
 
 ```text
 https://raw.githubusercontent.com/heyNag/agent-tools/main/skillshare-hub.json

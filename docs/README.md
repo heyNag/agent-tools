@@ -17,8 +17,8 @@ Before making structural changes, future agents should read:
 Use this map when you are new to the repo:
 
 - Installing a public tool: use the root `README.md` install sections.
-- Installing through Skillshare or troubleshooting duplicate Skillshare search
-  results: read `skillshare.md`.
+- Optional Skillshare hub installs or duplicate Skillshare search results: read
+  `skillshare.md`.
 - Understanding what to edit: read `architecture.md`, then
   `distribution-targets.md`.
 - Adding `packages/awesome-skill`: follow `adding-a-skill.md`.

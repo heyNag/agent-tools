@@ -28,7 +28,7 @@ generated/claude/custom-skills/<name>/   Claude Desktop / claude.ai custom skill
 generated/codex/skills/<name>/           Codex skill package
 generated/agent-skills/<name>/           OpenCode / generic SKILL.md package
 .claude-plugin/marketplace.json          Claude Code marketplace catalog
-skillshare-hub.json                      Skillshare hub index
+skillshare-hub.json                      optional Skillshare hub index
 ```
 
 The generator decides what to build from `packages/<name>/tool.json`.
@@ -49,8 +49,8 @@ Use this target set for a normal agent-agnostic skill:
 ```
 
 With those targets, `make rebuild-generated` builds every target listed above.
-It also regenerates `skillshare-hub.json`, so Skillshare Hub users can discover
-the package from the canonical `packages/awesome-skill` source path.
+It also regenerates `skillshare-hub.json`, so optional Skillshare Hub users can
+discover the package from the canonical `packages/awesome-skill` source path.
 Adding the package name to `.github/workflows/release-skill.yml` also makes it
 available to the manual release/update workflow described in
 [`updating-a-skill.md`](updating-a-skill.md).
@@ -153,8 +153,8 @@ Target meanings:
   `generated/claude/custom-skills/<name>`.
 
 `tags` are optional but recommended. They appear in `skillshare-hub.json` and
-help Skillshare Hub search. For public skills in this repo, add the same tags
-to `SKILL.md` frontmatter so Skillshare-style indexers can read the skill file
+help optional Skillshare Hub search. For public skills in this repo, add the
+same tags to `SKILL.md` frontmatter so skill indexers can read the skill file
 directly. Keep tags short, lowercase, and public-safe.
 
 Set `has_mcp` to `true` only when an MCP folder exists or is intentionally part

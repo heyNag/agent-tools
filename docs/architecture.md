@@ -10,7 +10,7 @@ The repo shape is intentionally small:
 packages/             local skills, commands, and package source
 generated/            generated Claude/Codex/OpenCode packages, committed for public install
 .claude-plugin/       generated Claude Code marketplace catalog
-skillshare-hub.json   generated Skillshare hub index for canonical package discovery
+skillshare-hub.json   optional generated Skillshare hub index
 mcp/                  deployable MCP server shapes, one folder per MCP server
 scripts/              install, test, sync, and helper scripts
 .github/workflows/    CI
@@ -71,7 +71,7 @@ workspace layout.
 
 ```text
 .claude-plugin/marketplace.json       generated Claude Code marketplace catalog
-skillshare-hub.json                   generated Skillshare hub index
+skillshare-hub.json                   optional generated Skillshare hub index
 generated/claude/plugins/<name>       Claude Code plugin package
 generated/claude/custom-skills/<name> Claude Desktop / claude.ai custom skill ZIP source
 generated/codex/skills/<name>         Codex skill package
@@ -105,8 +105,8 @@ Packages follow the same manifest pattern:
 - `generated/codex/skills/<name>` exists when the package targets Codex.
 - `generated/agent-skills/<name>` exists when the package targets generic
   `SKILL.md` Agent Skills consumers such as OpenCode.
-- `skillshare-hub.json` lists public agent-compatible packages for Skillshare
-  Hub search and points at `heyNag/agent-tools/packages/<name>`.
+- `skillshare-hub.json` lists public agent-compatible packages for optional
+  Skillshare Hub search and points at `heyNag/agent-tools/packages/<name>`.
 - `mcp/<name>` exists only when the package needs an MCP server shape.
 
 ## MCP

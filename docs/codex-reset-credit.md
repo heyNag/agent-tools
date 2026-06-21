@@ -77,7 +77,7 @@ rm -rf ~/.config/opencode/skills/codex-reset-credit
 cp -R generated/agent-skills/codex-reset-credit ~/.config/opencode/skills/codex-reset-credit
 ```
 
-Skillshare install:
+Optional Skillshare install, if you already use Skillshare:
 
 ```sh
 skillshare install heyNag/agent-tools/packages/codex-reset-credit --track

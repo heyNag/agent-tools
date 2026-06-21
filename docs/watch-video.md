@@ -86,7 +86,7 @@ rm -rf ~/.config/opencode/skills/watch-video
 cp -R generated/agent-skills/watch-video ~/.config/opencode/skills/watch-video
 ```
 
-Skillshare install:
+Optional Skillshare install, if you already use Skillshare:
 
 ```sh
 skillshare install heyNag/agent-tools/packages/watch-video --track
