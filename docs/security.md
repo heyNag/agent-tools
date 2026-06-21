@@ -27,7 +27,7 @@ session files, but it must not modify them.
 
 These examples verify key shape without printing the key.
 
-Check an already-exported key:
+Check an exported key:
 
 ```sh
 python3 - <<'PY'

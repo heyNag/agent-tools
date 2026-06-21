@@ -22,9 +22,9 @@ Rules for future AI agents working in this repo:
   ownership markers.
 - Use `make verify-generated-clean` to confirm committed public outputs match
   package source and manifests.
-- Never move old generated files into a new location as the final step. Remove
+- Do not move generated files into a new location as the final step. Remove
   `.claude-plugin/` and `generated/` with `make rebuild-generated` so the
-  generated markers and headers are produced by the current scripts.
+  generated markers and headers are produced by the builder scripts.
 - Use `make doctor` before live `watch-video` debugging when local dependencies
   or API key shape are uncertain.
 - Prefer small, testable changes.

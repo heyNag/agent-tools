@@ -83,8 +83,7 @@ plugin/plugin.json               # Claude plugin metadata
 tests/                           # offline helper tests
 ```
 
-The helper was ported from Nag's local dotfiles skill. Future edits should live
-in this package source directory.
+Keep edits in this package source directory.
 
 Generated install packages contain a subset of those files:
 

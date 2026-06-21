@@ -75,7 +75,7 @@ Local development install from source:
 ./scripts/install-all.sh
 ```
 
-## Current Design
+## Design
 
 The helper script:
 
@@ -117,5 +117,4 @@ credit IDs, email addresses, profile image URLs, or unredacted auth paths.
 
 ## Source Note
 
-This package was ported from Nag's local dotfiles skill. Future changes should
-happen in this repo under `packages/codex-reset-credit`.
+Keep changes for this package in `packages/codex-reset-credit`.

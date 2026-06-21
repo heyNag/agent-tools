@@ -3,7 +3,7 @@
 `agent-tools` is a collection of agent tools, skills, commands, plugins, helper
 scripts, and future MCP servers.
 
-Current public tools:
+Public tools:
 
 - `watch-video` - inspect short videos, tutorials, demos, screen recordings,
   and UI bug videos.
@@ -109,7 +109,7 @@ export GROQ_MODEL="whisper-large-v3-turbo"
 Default Groq model: `whisper-large-v3-turbo`.
 OpenAI transcription is also available with `--transcriber openai` and
 `OPENAI_API_KEY`; the default OpenAI model is `whisper-1` so segment timestamps
-work with the current verbose JSON response.
+work with the verbose JSON response shape used by `watch-video`.
 
 `codex-reset-credit` uses local Codex auth/session files when available. It is
 read-only and must not print tokens, account IDs, raw auth contents, or modify
@@ -158,6 +158,8 @@ scripts/              build, install, test, and helper scripts
 .github/workflows/    CI
 ```
 
+`generated/` includes Claude Code plugin packages, Claude custom-skill upload
+folders, Codex skill folders, and OpenCode/generic Agent Skill folders.
 `generated/` and `.claude-plugin/` are generated from `packages/`, but they are
 committed as public install targets.
 
@@ -250,8 +252,9 @@ claude plugin validate generated/claude/plugins/codex-reset-credit
 
 Start with [docs/README.md](docs/README.md).
 
-Future agents should read `docs/README.md`, `docs/architecture.md`, and
-`docs/agent-guidelines.md` before making structural changes.
+Future agents should read `docs/README.md`, `docs/architecture.md`,
+`docs/agent-guidelines.md`, `docs/agent-compatibility.md`, and
+`docs/distribution-targets.md` before making structural changes.
 
 ## Security
 

@@ -7,7 +7,7 @@ but they are not source of truth.
 As of now, some targets share the same core shape, but each target has a
 slightly different wrapper or layout.
 
-All targets share:
+All generated package targets share:
 
 - `README.md`
 - `LICENSE`
@@ -55,7 +55,7 @@ flowchart TD
   MP --> V
 ```
 
-## Current Target Shapes
+## Target Shapes
 
 All generated targets share the same package source:
 
@@ -155,8 +155,8 @@ make verify-generated-clean
 
 `make rebuild-generated` deletes `.claude-plugin/` and `generated/`, then
 recreates them from `packages/`. That is intentional: generated files should
-inherit source-path wording and generated notices from the current builder
-scripts, not from manual edits.
+inherit source-path wording and generated notices from the builder scripts, not
+from manual edits.
 
 ## Per-Package Flow
 

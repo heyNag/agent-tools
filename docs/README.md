@@ -24,9 +24,9 @@ Recommended reading order for broader work:
 8. `roadmap.md`
 9. `decisions.md`
 
-Keep these docs current when architecture, workflow, install behavior, security
-practice, or package scope changes. A future agent should not need prior chat
-history to understand why the repo is shaped this way.
+Keep these docs aligned with the repo when architecture, workflow, install
+behavior, security practice, or package scope changes. A future agent should be
+able to understand the repo from files alone.
 
 For source/generated ownership, start with `architecture.md` and
 `distribution-targets.md`. In short, edit the package under `packages/`, then

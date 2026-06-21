@@ -1,8 +1,7 @@
 # Watch Video
 
-`watch-video` is the first local agent tool in this repo. It helps agents inspect
-YouTube URLs, local videos, screen recordings, tutorials, demos, and UI bug
-videos.
+`watch-video` helps agents inspect YouTube URLs, local videos, screen
+recordings, tutorials, demos, and UI bug videos.
 
 Source of truth:
 
@@ -91,7 +90,7 @@ Preflight:
 python3 packages/watch-video/scripts/doctor.py
 ```
 
-## Current Design
+## Design
 
 The `watch.py` flow is:
 
@@ -125,8 +124,8 @@ Default OpenAI transcription model:
 whisper-1
 ```
 
-`whisper-1` is used for OpenAI because the current script needs verbose JSON
-with segment timestamps.
+`whisper-1` is used for OpenAI because `watch-video` needs verbose JSON with
+segment timestamps.
 
 ## Outputs
 
@@ -190,7 +189,7 @@ on the local `ffmpeg` build.
 Use `--cleanup` to remove downloaded media and audio after the report is written.
 Add `--cleanup-frames` only when frame files should also be removed.
 
-Current CLI option surface:
+CLI option surface:
 
 - `--transcriber groq|openai|none`
 - `--mode general|tutorial|ui-bug|notes`

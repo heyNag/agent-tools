@@ -63,7 +63,7 @@ zip -r watch-video.zip watch-video
 zip -r codex-reset-credit.zip codex-reset-credit
 ```
 
-OpenCode can use the same portable bundle:
+OpenCode uses the generated agent-skill bundle:
 
 ```sh
 mkdir -p ~/.config/opencode/skills

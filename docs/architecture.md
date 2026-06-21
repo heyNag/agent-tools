@@ -3,7 +3,7 @@
 `agent-tools` is a public agent tooling workspace for local skills, commands,
 plugins, helper scripts, and future MCP servers.
 
-The current shape is intentionally small:
+The repo shape is intentionally small:
 
 ```text
 packages/             local skills, commands, and package source
@@ -15,12 +15,15 @@ scripts/              install, test, sync, and helper scripts
 docs/                 orientation and project memory
 ```
 
+`generated/` includes Claude Code plugin packages, Claude custom-skill upload
+folders, Codex skill folders, and OpenCode/generic Agent Skill folders.
+
 ## Packages
 
 `packages/` is for local agent-facing source of truth. Packages can include
 skills, commands, plugin metadata, helper scripts, and tests.
 
-The current packages are:
+Packages in this repo:
 
 ```text
 packages/codex-reset-credit
@@ -43,7 +46,7 @@ Each public package should declare its distribution targets in:
 packages/<name>/tool.json
 ```
 
-Current public packages are `watch-video` and `codex-reset-credit`.
+Public packages are `watch-video` and `codex-reset-credit`.
 
 ## Public Distribution
 
@@ -92,14 +95,14 @@ Future packages should follow the same manifest pattern:
 own folder and be independently buildable and deployable later, ideally with its
 own `Dockerfile`.
 
-The current MCP placeholder is:
+MCP placeholder:
 
 ```text
 mcp/watch-video
 ```
 
-It is a minimal TypeScript MCP server skeleton. It currently exposes a status
-tool only. It does not wrap video processing yet.
+It is a minimal TypeScript MCP server skeleton. It exposes a status tool only
+and does not wrap video processing.
 
 Future `watch-video` MCP work should add real tools only after the local package
 surface is stable. Candidate tools include `video_info`, `video_analyze`,

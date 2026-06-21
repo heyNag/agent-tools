@@ -7,12 +7,13 @@ This roadmap is directional. It is not a commitment to overbuild the repo.
 Maintain `packages/watch-video` as a useful local skill/commands/scripts package
 for video analysis, and `packages/codex-reset-credit` as a read-only local skill
 for checking Codex reset credits and rate-limit reset windows. Keep both easy to
-install into Claude and Codex.
+install into Claude Code, Claude custom skills, Codex, and OpenCode/generic
+Agent Skills consumers.
 
-`watch-video` currently includes preflight checks, focused URL downloads,
-caption-first transcripts, bounded auto frame extraction, report modes, and Groq
-fallback. `codex-reset-credit` currently includes sanitized text/JSON reports,
-live reset-credit lookup, and local-only rate-limit snapshot reads.
+`watch-video` includes preflight checks, focused URL downloads, caption-first
+transcripts, bounded auto frame extraction, report modes, and Groq fallback.
+`codex-reset-credit` includes sanitized text/JSON reports, live reset-credit
+lookup, and local-only rate-limit snapshot reads.
 
 ## Phase 2: Better Reports And Fallbacks
 

@@ -58,7 +58,7 @@ python3 scripts/watch.py "<source>" --mode ui-bug --frame-format png
 python3 scripts/watch.py "<source>" --transcriber none --frames
 ```
 
-Current option surface:
+CLI option surface:
 
 - `--transcriber groq|openai|none`
 - `--mode general|tutorial|ui-bug|notes`
