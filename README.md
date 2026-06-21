@@ -55,6 +55,8 @@ cd agent-tools
 
 ## Requirements
 
+`watch-video` needs:
+
 ```sh
 brew install yt-dlp ffmpeg jq
 ```
@@ -79,9 +81,12 @@ work with the current verbose JSON response.
 
 `codex-reset-credit` uses local Codex auth/session files when available. It is
 read-only and must not print tokens, account IDs, raw auth contents, or modify
-Codex state.
+Codex state. It uses Python standard-library code and has no third-party Python
+dependency.
 
 ## Quick Test
+
+`watch-video`:
 
 ```sh
 python3 packages/watch-video/scripts/watch.py \
@@ -96,6 +101,12 @@ For UI-heavy recordings, prefer PNG frames:
 
 ```sh
 python3 packages/watch-video/scripts/watch.py ./bug.mov --mode ui-bug --frame-format png
+```
+
+`codex-reset-credit` local-only smoke test:
+
+```sh
+python3 packages/codex-reset-credit/scripts/check_reset_credits.py --no-live
 ```
 
 Useful flags include `--transcriber groq|openai|none`, `--mode

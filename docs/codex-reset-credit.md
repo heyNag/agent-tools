@@ -90,6 +90,5 @@ credit IDs, email addresses, profile image URLs, or unredacted auth paths.
 
 ## Source Note
 
-This package was ported from Nag's local dotfiles skill at
-`/Users/nag/.dotfiles/ai/skills/codex-reset-credit`. Future changes should
+This package was ported from Nag's local dotfiles skill. Future changes should
 happen in this repo under `packages/codex-reset-credit`.

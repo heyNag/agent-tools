@@ -15,7 +15,7 @@ In the `agent-tools` repo, source lives under `packages/watch-video`. Public
 install targets are generated from that source into
 `generated/claude/plugins/watch-video` and `generated/codex/skills/watch-video`.
 
-Claude Code users install from the marketplace package in
+Claude Code marketplace metadata points at the generated plugin package under
 `generated/claude/plugins/watch-video`. Codex and generic skill users can copy
 `generated/codex/skills/watch-video` into their local skills directory.
 
@@ -44,10 +44,20 @@ verbose JSON segment timestamps.
 
 ## Quickstart
 
-From this package directory:
+From the source package directory or a Codex/generic skill install:
 
 ```sh
 python3 scripts/watch.py "https://www.youtube.com/watch?v=DTCyvo6cC54" \
+  --duration 30 \
+  --transcriber none \
+  --frame-mode auto \
+  --max-frames 8
+```
+
+From the generated Claude plugin package root, use the skill subdirectory:
+
+```sh
+python3 skills/watch-video/scripts/watch.py "https://www.youtube.com/watch?v=DTCyvo6cC54" \
   --duration 30 \
   --transcriber none \
   --frame-mode auto \
@@ -74,7 +84,7 @@ Common options:
 
 Outputs are written under `.watch-video/runs/<run-id>/` by default.
 
-## Files
+## Source Files
 
 ```text
 SKILL.md              # skill instructions for local agents
@@ -86,3 +96,10 @@ scripts/doctor.py
 
 The source package also includes command prompts, plugin metadata, tests, and
 `tool.json`.
+
+Generated install packages contain a subset of those files:
+
+- Claude plugin package: `README.md`, `LICENSE`, `.claude-plugin/plugin.json`,
+  commands, and `skills/watch-video/`.
+- Codex/generic skill package: `README.md`, `LICENSE`, `SKILL.md`, and
+  `scripts/`.

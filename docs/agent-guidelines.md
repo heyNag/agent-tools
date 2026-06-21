@@ -42,7 +42,7 @@ Rules for future AI agents working in this repo:
 Run:
 
 ```sh
-make doctor
+make doctor  # watch-video preflight
 make test
 make syntax
 make mcp-build

@@ -38,10 +38,16 @@ make verify-generated-clean
 
 ## Usage
 
-From this package directory:
+From the source package directory or a Codex/generic skill install:
 
 ```sh
 python3 scripts/check_reset_credits.py
+```
+
+From the generated Claude plugin package root, use the skill subdirectory:
+
+```sh
+python3 skills/codex-reset-credit/scripts/check_reset_credits.py
 ```
 
 Useful options:
@@ -61,7 +67,7 @@ python3 scripts/check_reset_credits.py --timezone UTC
 - Local session snapshots may be stale if Codex has not emitted recent usage
   events.
 
-## Files
+## Source Files
 
 ```text
 SKILL.md                         # skill instructions for agents
@@ -71,5 +77,12 @@ plugin/plugin.json               # Claude plugin metadata
 tests/                           # offline helper tests
 ```
 
-The helper was ported from Nag's local dotfiles skill at
-`/Users/nag/.dotfiles/ai/skills/codex-reset-credit`.
+The helper was ported from Nag's local dotfiles skill. Future edits should live
+in this package source directory.
+
+Generated install packages contain a subset of those files:
+
+- Claude plugin package: `README.md`, `LICENSE`, `.claude-plugin/plugin.json`,
+  commands, and `skills/codex-reset-credit/`.
+- Codex/generic skill package: `README.md`, `LICENSE`, `SKILL.md`, and
+  `scripts/`.

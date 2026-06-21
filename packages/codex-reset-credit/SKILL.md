@@ -82,6 +82,6 @@ Keep the answer short. Do not paste full JSON unless requested.
 
 ## Source Note
 
-This package was ported from Nag's local dotfiles skill at
-`/Users/nag/.dotfiles/ai/skills/codex-reset-credit`. Keep future edits in this
-repo under `packages/codex-reset-credit`, then run `make rebuild-generated`.
+This package was ported from Nag's local dotfiles skill. Keep future edits in
+this repo under `packages/codex-reset-credit`, then run
+`make rebuild-generated`.
