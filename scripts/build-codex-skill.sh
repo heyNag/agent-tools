@@ -169,7 +169,7 @@ After editing source:
 
 1. Edit \`packages/$PACKAGE\`.
 2. Run \`make rebuild-generated\`.
-3. Run \`make verify-generated-clean\`.
+3. Run \`make public-check\`.
 4. Commit both source and regenerated output changes.
 EOF
 prune_generated "$OUT"

@@ -76,13 +76,25 @@ audit-generated:
 	done
 
 verify-generated-clean:
-	@$(MAKE) rebuild-generated >/dev/null
-	@if ! git diff --exit-code -- .claude-plugin generated skillshare-hub.json; then \
-		echo "generated package outputs are stale; run make rebuild-generated and commit the results" >&2; \
-		exit 1; \
-	fi
-	@if [ -n "$$(git ls-files --others --exclude-standard -- .claude-plugin generated skillshare-hub.json)" ]; then \
-		git ls-files --others --exclude-standard -- .claude-plugin generated skillshare-hub.json >&2; \
+	@set -e; \
+	tmp_dir="$$(mktemp -d)"; \
+	trap 'rm -rf "$$tmp_dir"' EXIT; \
+	mkdir -p "$$tmp_dir/before"; \
+	for path in .claude-plugin generated skillshare-hub.json; do \
+		if [ -e "$$path" ]; then \
+			mkdir -p "$$tmp_dir/before/$$(dirname "$$path")"; \
+			cp -R "$$path" "$$tmp_dir/before/$$path"; \
+		fi; \
+	done; \
+	$(MAKE) rebuild-generated >/dev/null; \
+	stale=0; \
+	for path in .claude-plugin generated skillshare-hub.json; do \
+		if ! diff -ruN "$$tmp_dir/before/$$path" "$$path" >/dev/null; then \
+			diff -ruN "$$tmp_dir/before/$$path" "$$path" >&2 || true; \
+			stale=1; \
+		fi; \
+	done; \
+	if [ "$$stale" -ne 0 ]; then \
 		echo "generated package outputs are stale; run make rebuild-generated and commit the results" >&2; \
 		exit 1; \
 	fi

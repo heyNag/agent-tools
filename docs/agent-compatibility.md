@@ -128,8 +128,7 @@ folders avoids case-sensitive/case-insensitive filesystem collisions. Edit
 
 ```sh
 make rebuild-generated
-make audit-generated
-make verify-generated-clean
+make public-check
 ```
 
 ## Runtime Boundary

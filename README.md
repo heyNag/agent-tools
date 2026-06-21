@@ -292,8 +292,7 @@ scratch:
 
 ```sh
 make rebuild-generated
-make audit-generated
-make verify-generated-clean
+make public-check
 ```
 
 `make rebuild-generated` deletes only `.claude-plugin/` and `generated/`, then

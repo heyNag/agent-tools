@@ -51,7 +51,7 @@ Edit source first, then run:
 
 ```sh
 make rebuild-generated
-make verify-generated-clean
+make public-check
 ```
 
 ## Usage

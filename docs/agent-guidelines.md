@@ -39,8 +39,8 @@ Rules for future AI agents working in this repo:
   when a helper script needs local binaries, local auth files, or shell access.
 - Treat `packages/<name>/SOURCE.md` and generated `GENERATED.md` files as the
   ownership markers.
-- Use `make verify-generated-clean` to confirm committed public outputs match
-  package source and manifests.
+- Use `make verify-generated-clean` to confirm current generated public outputs
+  match package source and manifests.
 - Do not move generated files into a new location as the final step. Remove
   `.claude-plugin/` and `generated/` with `make rebuild-generated` so the
   generated markers and headers are produced by the builder scripts.

@@ -49,26 +49,26 @@ YYYY.M.D
 Examples:
 
 ```text
-2026.6.21
-2026.12.5
-2027.1.14
+YYYY.M.D
+YYYY.M.D.1
+YYYY.M.D.2
 ```
 
 Do not zero-pad version parts. If a fixed-width date is useful in prose, write
 it as a release date:
 
 ```text
-Release date: 2026-06-21
-Plugin version: 2026.6.21
+Release date: YYYY-MM-DD
+Plugin version: YYYY.M.D
 ```
 
 If the same skill is released more than once on the same UTC day, append a
 numeric same-day sequence:
 
 ```text
-2026.6.21
-2026.6.21.1
-2026.6.21.2
+YYYY.M.D
+YYYY.M.D.1
+YYYY.M.D.2
 ```
 
 The version source is:
@@ -193,7 +193,7 @@ Use the same helper locally when testing release behavior:
 
 ```sh
 python3 scripts/bump-skill-version.py x-bookmarks --dry-run
-python3 scripts/bump-skill-version.py x-bookmarks --date 2026-06-21 --dry-run
+python3 scripts/bump-skill-version.py x-bookmarks --date YYYY-MM-DD --dry-run
 ```
 
 Without `--dry-run`, the helper refuses to run outside the GitHub Actions
@@ -401,9 +401,7 @@ Generated outputs are stale:
 
 ```sh
 make rebuild-generated
-make verify-skill-metadata
-make audit-generated
-make verify-generated-clean
+make public-check
 ```
 
 ## Final Checklist
@@ -411,9 +409,8 @@ make verify-generated-clean
 - Source changes are under `packages/<name>`.
 - Public release version is bumped by the manual `Release Skill` workflow.
 - `packages/<name>/plugin/plugin.json` version was not edited by hand.
-- Generated outputs are rebuilt with `make rebuild-generated`.
-- Skill metadata is checked with `make verify-skill-metadata`.
-- All verification commands pass.
+- Generated outputs are rebuilt from source.
+- `make public-check` passes.
 - Docs mention any changed setup, update, or runtime behavior.
 - No secrets, local auth state, media, transcripts, caches, or runtime
   artifacts are staged.

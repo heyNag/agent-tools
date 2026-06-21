@@ -93,6 +93,6 @@ After editing source:
 
 1. Edit package manifests under `packages/`.
 2. Run `make rebuild-generated`.
-3. Run `make verify-generated-clean`.
+3. Run `make public-check`.
 4. Commit both source and regenerated output changes.
 EOF

@@ -83,9 +83,7 @@ Do not manually edit generated public outputs during normal development. Edit
 
 ```sh
 make rebuild-generated
-make verify-packages
-make audit-generated
-make verify-generated-clean
+make public-check
 ```
 
 `make rebuild-generated` removes only the committed generated output roots

@@ -287,9 +287,7 @@ Edit source first, then run:
 
 ```sh
 make rebuild-generated
-make verify-packages
-make audit-generated
-make verify-generated-clean
+make public-check
 ```
 ~~~
 
@@ -321,9 +319,7 @@ After changing package source, run:
 
 ```sh
 make rebuild-generated
-make verify-packages
-make audit-generated
-make verify-generated-clean
+make public-check
 ```
 
 This source directory generates these public install copies:
@@ -472,7 +468,7 @@ What each check catches:
   and forbidden files.
 - `make audit-generated`: generated files match source paths after stripping
   generated notices.
-- `make verify-generated-clean`: a clean rebuild does not change committed
+- `make verify-generated-clean`: a clean rebuild does not change the current
   generated outputs.
 - `git diff --check`: whitespace mistakes.
 - `make install-dry-run`: local install scripts can preview without writing.
@@ -576,8 +572,7 @@ Generated files are stale:
 
 ```sh
 make rebuild-generated
-make audit-generated
-make verify-generated-clean
+make public-check
 ```
 
 A generated file needs a wording fix:

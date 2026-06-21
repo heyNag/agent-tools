@@ -113,9 +113,7 @@ manifest, or a plugin version, run:
 
 ```sh
 make rebuild-generated
-make verify-skill-metadata
-make verify-packages
-make verify-generated-clean
+make public-check
 ```
 
 `make verify-packages` checks that every public agent-compatible package appears

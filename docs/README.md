@@ -64,9 +64,7 @@ When generated files need to change, use the clean rebuild path:
 
 ```sh
 make rebuild-generated
-make verify-skill-metadata
-make audit-generated
-make verify-generated-clean
+make public-check
 ```
 
 That removes `.claude-plugin/` and `generated/`, recreates them from

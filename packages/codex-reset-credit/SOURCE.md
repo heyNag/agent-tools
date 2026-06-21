@@ -16,9 +16,7 @@ After changing package source, run:
 
 ```sh
 make rebuild-generated
-make verify-packages
-make audit-generated
-make verify-generated-clean
+make public-check
 ```
 
 This source directory generates these public install copies:

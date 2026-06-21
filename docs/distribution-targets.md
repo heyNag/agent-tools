@@ -191,10 +191,7 @@ To update generated outputs:
 
 ```sh
 make rebuild-generated
-make verify-skill-metadata
-make verify-packages
-make audit-generated
-make verify-generated-clean
+make public-check
 ```
 
 `make rebuild-generated` deletes `.claude-plugin/` and `generated/`, then
