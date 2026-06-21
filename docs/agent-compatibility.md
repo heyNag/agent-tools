@@ -20,6 +20,9 @@ generated/codex/skills/<name>          Codex skill package
 generated/agent-skills/<name>          OpenCode and generic SKILL.md skill folder
 ```
 
+For diagrams and exact per-target folder shapes, see
+[`distribution-targets.md`](distribution-targets.md).
+
 ## Surface Map
 
 Claude Code installs through the marketplace catalog:

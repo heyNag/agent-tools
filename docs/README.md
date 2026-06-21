@@ -10,25 +10,27 @@ Before making structural changes, future agents should read:
 2. `docs/architecture.md`
 3. `docs/agent-guidelines.md`
 4. `docs/agent-compatibility.md`
+5. `docs/distribution-targets.md`
 
 Recommended reading order for broader work:
 
 1. `architecture.md`
 2. `agent-compatibility.md`
-3. `agent-guidelines.md`
-4. `security.md`
-5. `watch-video.md`
-6. `codex-reset-credit.md`
-7. `roadmap.md`
-8. `decisions.md`
+3. `distribution-targets.md`
+4. `agent-guidelines.md`
+5. `security.md`
+6. `watch-video.md`
+7. `codex-reset-credit.md`
+8. `roadmap.md`
+9. `decisions.md`
 
 Keep these docs current when architecture, workflow, install behavior, security
 practice, or package scope changes. A future agent should not need prior chat
 history to understand why the repo is shaped this way.
 
-For source/generated ownership, start with `architecture.md`. In short, edit
-the package under `packages/`, then rebuild the committed public outputs under
-`generated/` and `.claude-plugin/`.
+For source/generated ownership, start with `architecture.md` and
+`distribution-targets.md`. In short, edit the package under `packages/`, then
+rebuild the committed public outputs under `generated/` and `.claude-plugin/`.
 
 When generated files need to change, use the clean rebuild path:
 
