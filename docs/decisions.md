@@ -91,3 +91,13 @@ transcription with `whisper-1` as the default model.
 Reason: `watch-video` needs verbose JSON segment timestamps. `whisper-1` is the
 compatible OpenAI default for that response shape, while newer transcription
 models can be selected manually if the API response shape supports the workflow.
+
+## 2026-06-21: Port Codex Reset Credit As A Public Package
+
+Decision: Port the local dotfiles `codex-reset-credit` skill into
+`packages/codex-reset-credit` with Claude and Codex public outputs.
+
+Reason: It is a small, useful, read-only local agent tool that fits the
+`agent-tools` package model. The package keeps the same strict security
+boundary: inspect local Codex auth/session state and the reset-credit endpoint,
+but never print secrets or modify Codex state.

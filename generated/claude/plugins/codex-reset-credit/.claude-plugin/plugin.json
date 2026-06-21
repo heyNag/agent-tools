@@ -1,0 +1,10 @@
+{
+  "name": "codex-reset-credit",
+  "version": "0.1.0",
+  "description": "Check Codex reset credits and local rate-limit reset windows without exposing auth secrets.",
+  "author": {
+    "name": "Nagarjuna Boddu"
+  },
+  "repository": "https://github.com/heyNag/agent-tools",
+  "license": "MIT"
+}

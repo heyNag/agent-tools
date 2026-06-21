@@ -4,13 +4,16 @@ AUDIO ?=
 PYTHON ?= python3
 
 test:
-	PYTHONDONTWRITEBYTECODE=1 $(PYTHON) -m unittest discover -s packages/watch-video/tests -p 'test_*.py'
+	@set -e; \
+	for test_dir in packages/*/tests; do \
+		[ -d "$$test_dir" ] || continue; \
+		echo "testing $$test_dir"; \
+		PYTHONDONTWRITEBYTECODE=1 $(PYTHON) -m unittest discover -s "$$test_dir" -p 'test_*.py'; \
+	done
 
 syntax:
-	PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-python-syntax.py packages/watch-video/scripts/*.py
-	PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-python-syntax.py generated/codex/skills/watch-video/scripts/*.py
-	PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-python-syntax.py generated/claude/plugins/watch-video/skills/watch-video/scripts/*.py
-	PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-python-syntax.py scripts/*.py
+	@files="$$(find packages generated scripts -path '*/__pycache__' -prune -o -name '*.py' -print)"; \
+	PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-python-syntax.py $$files
 	bash -n scripts/*.sh
 
 doctor:
@@ -50,7 +53,11 @@ verify-packages:
 	./scripts/verify-packages.sh
 
 audit-generated:
-	./scripts/audit-generated.sh
+	@set -e; \
+	for tool_json in packages/*/tool.json; do \
+		package="$$(basename "$$(dirname "$$tool_json")")"; \
+		./scripts/audit-generated.sh "$$package"; \
+	done
 
 verify-generated-clean:
 	@$(MAKE) rebuild-generated >/dev/null

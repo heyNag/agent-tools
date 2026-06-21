@@ -3,6 +3,11 @@
 .env.local
 .watch-video/
 
+# Local Codex auth/session state must never be committed.
+.codex/
+auth.json
+rollout-*.jsonl
+
 # Watch Video run artifacts when custom output dirs are placed in the repo.
 **/audio.mp3
 **/metadata.json

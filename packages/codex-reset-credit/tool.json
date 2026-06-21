@@ -1,0 +1,7 @@
+{
+  "name": "codex-reset-credit",
+  "description": "Check Codex reset credits and local rate-limit reset windows without exposing auth secrets.",
+  "targets": ["claude", "codex"],
+  "has_mcp": false,
+  "public": true
+}

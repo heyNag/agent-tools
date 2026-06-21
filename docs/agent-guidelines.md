@@ -4,8 +4,8 @@ Rules for future AI agents working in this repo:
 
 - Preserve the high-level repo shape unless the user explicitly asks to change
   it.
-- Keep `packages/watch-video` as the local skill/commands/plugin source of
-  truth.
+- Keep package source under `packages/<name>` as the local skill/commands/plugin
+  source of truth.
 - Keep `mcp/watch-video` as a minimal deployable MCP placeholder until real MCP
   tools are explicitly requested.
 - Do not create MCP gateways unless explicitly requested.
@@ -13,8 +13,8 @@ Rules for future AI agents working in this repo:
   public outputs need to change.
 - Do not manually edit `generated/` or `.claude-plugin/` outputs unless the
   user explicitly asks for a generated-output-only change.
-- Treat `packages/watch-video/SOURCE.md` and generated `GENERATED.md` files as
-  the ownership markers.
+- Treat `packages/<name>/SOURCE.md` and generated `GENERATED.md` files as the
+  ownership markers.
 - Use `make verify-generated-clean` to confirm committed public outputs match
   package source and manifests.
 - Never move old generated files into a new location as the final step. Remove
@@ -27,6 +27,9 @@ Rules for future AI agents working in this repo:
 - Do not commit generated `.watch-video/` artifacts.
 - Do not commit secrets.
 - Do not print secrets.
+- For `codex-reset-credit`, never print Codex access tokens, refresh tokens,
+  account IDs, raw auth contents, credit IDs, email addresses, profile image
+  URLs, or unredacted auth paths.
 - Keep CI offline and no-secret.
 - Add or update tests for behavior changes.
 - Update docs when architecture, workflow, install behavior, or security

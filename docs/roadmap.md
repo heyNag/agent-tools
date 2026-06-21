@@ -2,12 +2,17 @@
 
 This roadmap is directional. It is not a commitment to overbuild the repo.
 
-## Phase 1: Local Watch Video
+## Phase 1: Local Tools
 
 Maintain `packages/watch-video` as a useful local skill/commands/scripts package
-for video analysis. Keep it easy to install into Claude and Codex. Current
-baseline includes preflight checks, focused URL downloads, caption-first
-transcripts, bounded auto frame extraction, report modes, and Groq fallback.
+for video analysis, and `packages/codex-reset-credit` as a read-only local skill
+for checking Codex reset credits and rate-limit reset windows. Keep both easy to
+install into Claude and Codex.
+
+`watch-video` currently includes preflight checks, focused URL downloads,
+caption-first transcripts, bounded auto frame extraction, report modes, and Groq
+fallback. `codex-reset-credit` currently includes sanitized text/JSON reports,
+live reset-credit lookup, and local-only rate-limit snapshot reads.
 
 ## Phase 2: Better Reports And Fallbacks
 

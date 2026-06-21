@@ -12,6 +12,18 @@ fail() {
   exit 1
 }
 
+json_has_target() {
+  python3 - "$SRC/tool.json" "$1" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], encoding="utf-8") as handle:
+    data = json.load(handle)
+targets = data.get("targets") or []
+print("true" if sys.argv[2] in targets else "false")
+PY
+}
+
 check_same_file() {
   local source_file="$1"
   local generated_file="$2"
@@ -202,23 +214,32 @@ status=0
   status=1
 }
 
-check_same_file "$SRC/README.md" "$CODEX/README.md" || status=1
-check_same_file "$SRC/SKILL.md" "$CODEX/SKILL.md" || status=1
-check_same_dir "$SRC/scripts" "$CODEX/scripts" || status=1
-[[ -f "$CODEX/GENERATED.md" ]] || {
-  echo "missing generated marker: generated/codex/skills/$PACKAGE/GENERATED.md" >&2
-  status=1
-}
+if [[ "$(json_has_target codex)" == "true" ]]; then
+  check_same_file "$SRC/README.md" "$CODEX/README.md" || status=1
+  check_same_file "$SRC/SKILL.md" "$CODEX/SKILL.md" || status=1
+  check_same_dir "$SRC/scripts" "$CODEX/scripts" || status=1
+  [[ -f "$CODEX/GENERATED.md" ]] || {
+    echo "missing generated marker: generated/codex/skills/$PACKAGE/GENERATED.md" >&2
+    status=1
+  }
+fi
 
-check_same_file "$SRC/README.md" "$PLUGIN/README.md" || status=1
-check_same_file "$SRC/SKILL.md" "$PLUGIN/skills/$PACKAGE/SKILL.md" || status=1
-check_same_file "$SRC/plugin/plugin.json" "$PLUGIN/.claude-plugin/plugin.json" || status=1
-check_same_dir "$SRC/scripts" "$PLUGIN/skills/$PACKAGE/scripts" || status=1
-check_same_dir "$SRC/commands" "$PLUGIN/commands" || status=1
-[[ -f "$PLUGIN/GENERATED.md" ]] || {
-  echo "missing generated marker: generated/claude/plugins/$PACKAGE/GENERATED.md" >&2
-  status=1
-}
+if [[ "$(json_has_target claude)" == "true" ]]; then
+  check_same_file "$SRC/README.md" "$PLUGIN/README.md" || status=1
+  check_same_file "$SRC/SKILL.md" "$PLUGIN/skills/$PACKAGE/SKILL.md" || status=1
+  if [[ -f "$SRC/plugin/plugin.json" ]]; then
+    check_same_file "$SRC/plugin/plugin.json" "$PLUGIN/.claude-plugin/plugin.json" || status=1
+  elif [[ ! -f "$PLUGIN/.claude-plugin/plugin.json" ]]; then
+    echo "missing generated plugin manifest: generated/claude/plugins/$PACKAGE/.claude-plugin/plugin.json" >&2
+    status=1
+  fi
+  check_same_dir "$SRC/scripts" "$PLUGIN/skills/$PACKAGE/scripts" || status=1
+  check_same_dir "$SRC/commands" "$PLUGIN/commands" || status=1
+  [[ -f "$PLUGIN/GENERATED.md" ]] || {
+    echo "missing generated marker: generated/claude/plugins/$PACKAGE/GENERATED.md" >&2
+    status=1
+  }
+fi
 
 if [[ "$status" -ne 0 ]]; then
   echo "generated outputs are out of sync; run make rebuild-generated" >&2

@@ -3,24 +3,35 @@
 `agent-tools` is a collection of agent tools, skills, commands, plugins, helper
 scripts, and future MCP servers.
 
-The current public tool is `watch-video`, a local video inspection package for
-short clips, tutorials, demos, screen recordings, and UI bug videos.
+Current public tools:
+
+- `watch-video` - inspect short videos, tutorials, demos, screen recordings,
+  and UI bug videos.
+- `codex-reset-credit` - check Codex reset credits and local rate-limit reset
+  windows without exposing auth secrets.
 
 ## Install For Claude Code
 
 ```text
 /plugin marketplace add heyNag/agent-tools
 /plugin install watch-video@agent-tools
+/plugin install codex-reset-credit@agent-tools
 ```
 
-After installing, try:
+After installing `watch-video`, try:
 
 ```text
 /watch-video:watch <video-url-or-path>
 ```
 
+After installing `codex-reset-credit`, try:
+
+```text
+/codex-reset-credit:codex-reset-credit
+```
+
 If your Claude Code version shows a different command name, run `/plugin list`
-or `/plugin details watch-video@agent-tools`.
+or `/plugin details <plugin>@agent-tools`.
 
 ## Install For Codex Or Generic Skills
 
@@ -30,6 +41,8 @@ cd agent-tools
 mkdir -p ~/.codex/skills
 rm -rf ~/.codex/skills/watch-video
 cp -R generated/codex/skills/watch-video ~/.codex/skills/watch-video
+rm -rf ~/.codex/skills/codex-reset-credit
+cp -R generated/codex/skills/codex-reset-credit ~/.codex/skills/codex-reset-credit
 ```
 
 ## Local Development Install
@@ -63,6 +76,10 @@ Default Groq model: `whisper-large-v3-turbo`.
 OpenAI transcription is also available with `--transcriber openai` and
 `OPENAI_API_KEY`; the default OpenAI model is `whisper-1` so segment timestamps
 work with the current verbose JSON response.
+
+`codex-reset-credit` uses local Codex auth/session files when available. It is
+read-only and must not print tokens, account IDs, raw auth contents, or modify
+Codex state.
 
 ## Quick Test
 
@@ -107,6 +124,7 @@ Edit source files here:
 
 ```text
 packages/watch-video/
+packages/codex-reset-credit/
 mcp/watch-video/
 scripts/
 docs/
@@ -117,6 +135,8 @@ Do not edit generated public install copies directly:
 ```text
 packages/watch-video/                                -> generated/claude/plugins/watch-video/
 packages/watch-video/                                -> generated/codex/skills/watch-video/
+packages/codex-reset-credit/                         -> generated/claude/plugins/codex-reset-credit/
+packages/codex-reset-credit/                         -> generated/codex/skills/codex-reset-credit/
 packages/*/tool.json and packages/*/plugin/plugin.json -> .claude-plugin/marketplace.json
 ```
 
@@ -125,7 +145,8 @@ mappings. Generated Markdown and Python files also include an in-file generated
 notice when the format allows comments. JSON and LICENSE files are covered by
 the nearest `GENERATED.md` marker.
 
-After changing `packages/watch-video`, rebuild generated outputs from scratch:
+After changing any package under `packages/`, rebuild generated outputs from
+scratch:
 
 ```sh
 make rebuild-generated
@@ -154,6 +175,7 @@ If marketplace install fails, run these from the repo root:
 ```sh
 claude plugin validate .
 claude plugin validate generated/claude/plugins/watch-video
+claude plugin validate generated/claude/plugins/codex-reset-credit
 ```
 
 ## Docs
@@ -165,9 +187,10 @@ Future agents should read `docs/README.md`, `docs/architecture.md`, and
 
 ## Security
 
-Do not commit real API keys, `.env.local`, `.watch-video/` artifacts, media
-files, transcripts, frames, caches, or local build outputs. Keep CI no-secret and
-free of live Groq/video/Claude requirements. See [docs/security.md](docs/security.md).
+Do not commit real API keys, Codex auth/session files, `.env.local`,
+`.watch-video/` artifacts, media files, transcripts, frames, caches, or local
+build outputs. Keep CI no-secret and free of live Groq/video/Codex/Claude
+requirements. See [docs/security.md](docs/security.md).
 
 ## Checks
 

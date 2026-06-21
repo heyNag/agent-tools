@@ -20,9 +20,10 @@ docs/                 orientation and project memory
 `packages/` is for local agent-facing source of truth. Packages can include
 skills, commands, plugin metadata, helper scripts, and tests.
 
-The current package is:
+The current packages are:
 
 ```text
+packages/codex-reset-credit
 packages/watch-video
 ```
 
@@ -31,13 +32,18 @@ metadata, Python scripts, docs, and tests. Its script surface includes local
 preflight, video watching, frame extraction, and transcription helpers. Edit
 source files there first.
 
+`packages/codex-reset-credit` owns the local `codex-reset-credit` skill,
+command, plugin metadata, Python helper, docs, and tests. It is read-only and
+checks Codex reset credits plus local Codex rate-limit windows without exposing
+auth secrets. Edit source files there first.
+
 Each public package should declare its distribution targets in:
 
 ```text
 packages/<name>/tool.json
 ```
 
-For now, the only public package is `watch-video`.
+Current public packages are `watch-video` and `codex-reset-credit`.
 
 ## Public Distribution
 
@@ -122,11 +128,14 @@ to edit; the right side is generated or installed from that source.
 
 ```text
 Edit: packages/watch-video/             source package
+Edit: packages/codex-reset-credit/      source package
 Edit: mcp/watch-video/                  MCP placeholder source
 Edit: scripts/                          build, install, and verification helpers
 Edit: docs/                             project memory and guidance
 Source: packages/watch-video/                              -> generated/claude/plugins/watch-video/
 Source: packages/watch-video/                              -> generated/codex/skills/watch-video/
+Source: packages/codex-reset-credit/                       -> generated/claude/plugins/codex-reset-credit/
+Source: packages/codex-reset-credit/                       -> generated/codex/skills/codex-reset-credit/
 Source: packages/*/tool.json and packages/*/plugin/        -> .claude-plugin/
 ```
 

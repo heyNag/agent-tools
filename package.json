@@ -4,8 +4,8 @@
   "private": true,
   "description": "Public agent tooling workspace for skills, commands, plugins, and future MCP servers.",
   "scripts": {
-    "test": "PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s packages/watch-video/tests -p 'test_*.py'",
-    "syntax": "PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-python-syntax.py packages/watch-video/scripts/*.py && PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-python-syntax.py generated/codex/skills/watch-video/scripts/*.py && PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-python-syntax.py generated/claude/plugins/watch-video/skills/watch-video/scripts/*.py && PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-python-syntax.py scripts/*.py && bash -n scripts/*.sh",
+    "test": "for dir in packages/*/tests; do [ -d \"$dir\" ] || continue; PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s \"$dir\" -p 'test_*.py'; done",
+    "syntax": "files=\"$(find packages generated scripts -path '*/__pycache__' -prune -o -name '*.py' -print)\"; PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-python-syntax.py $files && bash -n scripts/*.sh",
     "build:mcp": "npm --prefix mcp/watch-video run build",
     "build:packages": "./scripts/build-packages.sh",
     "rebuild:generated": "make rebuild-generated",

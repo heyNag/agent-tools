@@ -3,6 +3,7 @@
 Security rules for this repo:
 
 - Never commit real API keys, including Groq or OpenAI keys.
+- Never commit Codex auth/session files or copied local account data.
 - Use environment variables or gitignored `.env.local` for local secrets.
 - `.env.local` must remain ignored and untracked.
 - Do not echo full keys.
@@ -13,6 +14,11 @@ Security rules for this repo:
 - Committed generated package outputs live under `generated/` and
   `.claude-plugin/`; they are rebuilt from `packages/` and must not contain
   secrets or runtime artifacts.
+
+For `codex-reset-credit`, never print or commit Codex access tokens, refresh
+tokens, account IDs, raw auth file contents, credit IDs, email addresses, profile
+image URLs, or unredacted auth paths. The helper may read local Codex auth and
+session files, but it must not modify them.
 
 ## Safe Key Shape Checks
 
