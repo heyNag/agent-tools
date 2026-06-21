@@ -5,6 +5,10 @@ PYTHON ?= python3
 
 test:
 	@set -e; \
+	if [ -d tests ]; then \
+		echo "testing tests"; \
+		PYTHONDONTWRITEBYTECODE=1 $(PYTHON) -m unittest discover -s tests -p 'test_*.py'; \
+	fi; \
 	for test_dir in packages/*/tests; do \
 		[ -d "$$test_dir" ] || continue; \
 		echo "testing $$test_dir"; \

@@ -14,6 +14,8 @@ Before making structural changes, future agents should read:
 
 When adding a new skill package, read `docs/adding-a-skill.md` before creating
 files. It is the step-by-step checklist for targeting every generated surface.
+When updating an existing skill package or explaining how users refresh
+installed skills, read `docs/updating-a-skill.md`.
 
 Recommended reading order for broader work:
 
@@ -21,13 +23,14 @@ Recommended reading order for broader work:
 2. `agent-compatibility.md`
 3. `distribution-targets.md`
 4. `adding-a-skill.md`
-5. `agent-guidelines.md`
-6. `security.md`
-7. `watch-video.md`
-8. `codex-reset-credit.md`
-9. `x-bookmarks.md`
-10. `roadmap.md`
-11. `decisions.md`
+5. `updating-a-skill.md`
+6. `agent-guidelines.md`
+7. `security.md`
+8. `watch-video.md`
+9. `codex-reset-credit.md`
+10. `x-bookmarks.md`
+11. `roadmap.md`
+12. `decisions.md`
 
 Keep these docs aligned with the repo when architecture, workflow, install
 behavior, security practice, or package scope changes. A future agent should be

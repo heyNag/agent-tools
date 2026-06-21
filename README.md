@@ -275,6 +275,13 @@ Future agents should read `docs/README.md`, `docs/architecture.md`,
 When adding a new skill, follow
 [docs/adding-a-skill.md](docs/adding-a-skill.md).
 
+When updating an existing skill or helping users refresh installed copies,
+follow [docs/updating-a-skill.md](docs/updating-a-skill.md).
+
+Public skill releases are manual. Use the GitHub Actions `Release Skill`
+workflow to bump the selected package version using the UTC date, rebuild all
+generated targets, verify, commit, and push the release.
+
 ## Security
 
 Do not commit real API keys, Codex auth/session files, X/Twitter cookies or

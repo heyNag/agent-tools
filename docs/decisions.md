@@ -41,6 +41,15 @@ Use `packages/<name>/tool.json` to declare public status, install targets, and
 MCP presence. This keeps build and verification scripts generic without adding a
 package framework.
 
+## Manual Skill Releases
+
+Ordinary pushes and pull requests verify the repo but do not release skills.
+Public skill releases use the manual `Release Skill` GitHub Actions workflow.
+The workflow computes a UTC date-based package version, updates
+`packages/<name>/plugin/plugin.json`, rebuilds generated outputs for Claude
+Code, Claude Desktop, Codex, and OpenCode, verifies them, commits, and pushes
+the release commit.
+
 ## Agent-Agnostic Skill Bundles
 
 Build install targets for each supported agent surface from package source:
