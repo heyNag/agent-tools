@@ -9,6 +9,7 @@ The short version:
 Edit packages/<name>/ only.
 For normal development, run make rebuild-generated and commit source plus generated output together.
 For a public release, run the manual Release Skill GitHub Action.
+The workflow creates a skill-scoped GitHub Release and tag.
 Tell users how to update for their target.
 ```
 
@@ -148,6 +149,24 @@ generated/agent-skills/<name>
 ```text
 Release <name> <version>
 ```
+
+8. Creates a skill-scoped git tag and GitHub Release:
+
+```text
+<name>@<version>
+```
+
+Examples:
+
+```text
+watch-video@2026.6.21.1
+codex-reset-credit@2026.6.21.1
+x-bookmarks@2026.6.21.1
+```
+
+GitHub Releases are package-level because each skill can release
+independently. The repo does not publish GitHub Packages yet; there is no npm,
+container, or binary package artifact to publish today.
 
 Release workflows are serialized so two release button presses cannot update
 the shared marketplace catalog at the same time.
