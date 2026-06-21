@@ -25,6 +25,8 @@ Rules for future AI agents working in this repo:
 - Do not auto-release on ordinary pushes. Public skill releases go through the
   manual `Release Skill` GitHub Actions workflow, which uses UTC date-based
   package versions.
+- Do not manually edit `packages/<name>/plugin/plugin.json` versions. CI rejects
+  package version changes from non-release commits.
 - Do not manually edit `generated/` or `.claude-plugin/` outputs unless the
   user explicitly asks for a generated-output-only change.
 - Do not manually edit `skillshare-hub.json`.

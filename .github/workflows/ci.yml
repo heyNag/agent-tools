@@ -9,6 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-python@v6
         with:
@@ -17,6 +19,16 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: "22"
+
+      - name: Enforce release-only version bumps
+        run: |
+          base="${PR_BASE_SHA:-$PUSH_BASE_SHA}"
+          head="${PR_HEAD_SHA:-$GITHUB_SHA}"
+          python3 scripts/check-version-policy.py --base "$base" --head "$head" --actor "$GITHUB_ACTOR"
+        env:
+          PUSH_BASE_SHA: ${{ github.event.before }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
 
       - name: Python tests
         run: make test

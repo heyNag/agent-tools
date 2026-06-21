@@ -76,6 +76,10 @@ The version source is:
 packages/<name>/plugin/plugin.json
 ```
 
+Do not edit this version by hand. The only supported write path is the manual
+GitHub Actions `Release Skill` workflow. Local use of
+`scripts/bump-skill-version.py` is for `--dry-run` checks only.
+
 The generated Claude Code plugin manifest and marketplace catalog inherit the
 version from the source plugin metadata. The Skillshare hub `generatedAt` value
 is derived deterministically from package date versions, so rebuilding does not
@@ -171,7 +175,9 @@ python3 scripts/bump-skill-version.py x-bookmarks --dry-run
 python3 scripts/bump-skill-version.py x-bookmarks --date 2026-06-21 --dry-run
 ```
 
-Without `--dry-run`, the helper updates:
+Without `--dry-run`, the helper refuses to run outside the GitHub Actions
+`Release Skill` workflow. The workflow is the only supported command that
+updates:
 
 ```text
 packages/<name>/plugin/plugin.json
@@ -183,7 +189,8 @@ Version bump guidance:
 - Internal source-only cleanup that does not affect generated outputs or public
   behavior: a public release is optional.
 - Claude Code marketplace updates need a changed plugin version to reliably
-  appear as an update.
+  appear as an update, so use the release workflow when a public update should
+  be visible.
 
 ## Maintainer Update Flow
 
@@ -389,6 +396,7 @@ make verify-generated-clean
 
 - Source changes are under `packages/<name>`.
 - Public release version is bumped by the manual `Release Skill` workflow.
+- `packages/<name>/plugin/plugin.json` version was not edited by hand.
 - Generated outputs are rebuilt with `make rebuild-generated`.
 - Skill metadata is checked with `make verify-skill-metadata`.
 - All verification commands pass.

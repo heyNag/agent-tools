@@ -65,7 +65,9 @@ Public skill releases use the manual `Release Skill` GitHub Actions workflow.
 The workflow computes a UTC date-based package version, updates
 `packages/<name>/plugin/plugin.json`, rebuilds generated outputs for Claude
 Code, Claude Desktop, Codex, and OpenCode, verifies them, commits, and pushes
-the release commit.
+the release commit. Local scripts may preview the next version with `--dry-run`,
+but write-mode version bumps are reserved for that workflow. CI rejects package
+plugin version changes from non-release commits.
 
 ## Agent-Agnostic Skill Bundles
 

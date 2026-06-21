@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import json
+import os
 import pathlib
 import re
 import sys
@@ -71,6 +72,15 @@ def write_plugin(path: pathlib.Path, data: dict) -> None:
     path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
 
 
+def running_in_release_workflow(env: dict[str, str] | None = None) -> bool:
+    env = env or os.environ
+    return (
+        env.get("GITHUB_ACTIONS") == "true"
+        and env.get("GITHUB_WORKFLOW") == "Release Skill"
+        and env.get("GITHUB_EVENT_NAME") == "workflow_dispatch"
+    )
+
+
 def bump_package(root: pathlib.Path, package: str, release_date: dt.date, dry_run: bool) -> str:
     path = package_plugin_path(root, package)
     data = load_plugin(path)
@@ -111,6 +121,14 @@ def main(argv: list[str] | None = None) -> int:
         help=argparse.SUPPRESS,
     )
     args = parser.parse_args(argv)
+
+    if not args.dry_run and not running_in_release_workflow():
+        print(
+            "error: package versions are bumped only by the GitHub Actions "
+            "`Release Skill` workflow. Use --dry-run locally.",
+            file=sys.stderr,
+        )
+        return 1
 
     release_date = args.date or utc_today()
     try:

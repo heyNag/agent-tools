@@ -180,6 +180,7 @@ Create `packages/awesome-skill/plugin/plugin.json`:
 `0.1.0` is a bootstrap version for the add-skill commit. The first public
 release should use the manual `Release Skill` workflow, which replaces it with
 the UTC date version described in `docs/updating-a-skill.md`.
+Do not manually replace `0.1.0` with a date version in the add-skill commit.
 
 The marketplace generator uses this file for the Claude Code plugin entry. If
 the file is missing, the builder creates basic defaults from `tool.json`, but

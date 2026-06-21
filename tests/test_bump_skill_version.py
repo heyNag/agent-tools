@@ -4,6 +4,7 @@ import json
 import pathlib
 import tempfile
 import unittest
+from unittest import mock
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -69,6 +70,47 @@ class BumpSkillVersionTests(unittest.TestCase):
             self.assertEqual(version, "2026.6.21")
             data = json.loads(plugin_path.read_text(encoding="utf-8"))
             self.assertEqual(data["version"], "0.1.0")
+
+    def test_main_refuses_local_write_mode(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp)
+            plugin_dir = root / "packages" / "x-bookmarks" / "plugin"
+            plugin_dir.mkdir(parents=True)
+            plugin_path = plugin_dir / "plugin.json"
+            plugin_path.write_text(
+                json.dumps({"name": "x-bookmarks", "version": "2026.6.21"}) + "\n",
+                encoding="utf-8",
+            )
+
+            with mock.patch.dict("os.environ", {}, clear=True), mock.patch("sys.stderr"):
+                code = self.module.main(["x-bookmarks", "--root", str(root), "--date", "2026-06-21"])
+
+            self.assertEqual(code, 1)
+            data = json.loads(plugin_path.read_text(encoding="utf-8"))
+            self.assertEqual(data["version"], "2026.6.21")
+
+    def test_main_allows_write_in_release_workflow(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp)
+            plugin_dir = root / "packages" / "x-bookmarks" / "plugin"
+            plugin_dir.mkdir(parents=True)
+            plugin_path = plugin_dir / "plugin.json"
+            plugin_path.write_text(
+                json.dumps({"name": "x-bookmarks", "version": "2026.6.21"}) + "\n",
+                encoding="utf-8",
+            )
+
+            env = {
+                "GITHUB_ACTIONS": "true",
+                "GITHUB_WORKFLOW": "Release Skill",
+                "GITHUB_EVENT_NAME": "workflow_dispatch",
+            }
+            with mock.patch.dict("os.environ", env, clear=True), mock.patch("sys.stdout"):
+                code = self.module.main(["x-bookmarks", "--root", str(root), "--date", "2026-06-21"])
+
+            self.assertEqual(code, 0)
+            data = json.loads(plugin_path.read_text(encoding="utf-8"))
+            self.assertEqual(data["version"], "2026.6.21.1")
 
 
 if __name__ == "__main__":
