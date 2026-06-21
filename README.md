@@ -379,6 +379,15 @@ no-secret and free of live Groq/video/Codex/X/Claude requirements. See
 
 ## Checks
 
+Run the full public-readiness check before pushing source or generated output
+changes:
+
+```sh
+make public-check
+```
+
+The individual checks are:
+
 ```sh
 make test
 make syntax

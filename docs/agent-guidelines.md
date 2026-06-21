@@ -70,15 +70,7 @@ Run:
 
 ```sh
 make doctor  # watch-video preflight
-make test
-make syntax
-make mcp-build
-make rebuild-generated
-make build-skillshare-hub
-make verify-skill-metadata
-make verify-packages
-make audit-generated
-make verify-generated-clean
+make public-check
 git status
 ```
 

@@ -226,14 +226,7 @@ make rebuild-generated
 4. Verify:
 
 ```sh
-make test
-make syntax
-make mcp-build
-make verify-skill-metadata
-make verify-packages
-make audit-generated
-make verify-generated-clean
-git diff --check
+make public-check
 git status
 ```
 

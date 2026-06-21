@@ -33,8 +33,8 @@ Commit generated public install outputs under `generated/` and
 `.claude-plugin/`, plus generated discovery metadata such as
 `skillshare-hub.json`. Source still lives under `packages/`; generated outputs
 are rebuilt from scratch with `make rebuild-generated` and checked with
-`make verify-skill-metadata`, `make verify-packages`, `make audit-generated`, and
-`make verify-generated-clean`.
+`make public-check` before public-facing changes are pushed. The granular
+verification commands remain available for debugging individual failures.
 
 ## Optional Skillshare Discovery
 

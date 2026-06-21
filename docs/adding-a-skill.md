@@ -439,7 +439,14 @@ builder script, then run `make rebuild-generated` again.
 
 ## Step 13: Verify
 
-Run:
+Run the full public-readiness check:
+
+```sh
+make public-check
+```
+
+That command runs the checks below in a safe sequence. If you need to debug a
+single step, run the individual commands:
 
 ```sh
 make test
@@ -468,6 +475,7 @@ What each check catches:
 - `make verify-generated-clean`: a clean rebuild does not change committed
   generated outputs.
 - `git diff --check`: whitespace mistakes.
+- `make install-dry-run`: local install scripts can preview without writing.
 - `git status`: staged/untracked review.
 
 If Claude CLI is available, also run:
@@ -610,8 +618,7 @@ Do not add an MCP gateway.
 - `.github/workflows/release-skill.yml` includes the package in the `Release
   Skill` dropdown.
 - `make rebuild-generated` creates every target.
-- `make verify-skill-metadata`, `make verify-packages`,
-  `make audit-generated`, and `make verify-generated-clean` pass.
+- `make public-check` passes.
 - Generated files are committed with source changes.
 - The package can be released through the manual `Release Skill` workflow.
 - No secrets or local artifacts are committed.

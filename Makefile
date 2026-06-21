@@ -1,4 +1,4 @@
-.PHONY: test syntax doctor install install-dry-run groq-test mcp-build clean-generated build-claude-plugin build-codex-skill build-agent-skill build-claude-custom-skill build-skillshare-hub build-packages rebuild-generated verify-skill-metadata verify-packages audit-generated verify-generated-clean ci-local
+.PHONY: test syntax doctor install install-dry-run groq-test mcp-build clean-generated build-claude-plugin build-codex-skill build-agent-skill build-claude-custom-skill build-skillshare-hub build-packages rebuild-generated verify-skill-metadata verify-packages audit-generated verify-generated-clean public-check ci-local
 
 AUDIO ?=
 PYTHON ?= python3
@@ -87,4 +87,16 @@ verify-generated-clean:
 		exit 1; \
 	fi
 
-ci-local: test syntax mcp-build rebuild-generated verify-skill-metadata verify-packages audit-generated verify-generated-clean install-dry-run
+public-check:
+	$(MAKE) test
+	$(MAKE) syntax
+	$(MAKE) mcp-build
+	$(MAKE) rebuild-generated
+	$(MAKE) verify-skill-metadata
+	$(MAKE) verify-packages
+	$(MAKE) audit-generated
+	$(MAKE) verify-generated-clean
+	git diff --check
+	$(MAKE) install-dry-run
+
+ci-local: public-check

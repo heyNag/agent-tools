@@ -72,3 +72,9 @@ make verify-generated-clean
 That removes `.claude-plugin/` and `generated/`, recreates them from
 `packages/`, and rewrites `skillshare-hub.json`; generated outputs should not
 be moved or edited by hand.
+
+Before pushing public-facing changes, run the full sequential check:
+
+```sh
+make public-check
+```
