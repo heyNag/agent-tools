@@ -1,6 +1,5 @@
 # Skillshare should discover canonical source skill folders only.
 # Local artifacts are built under .dist/ and are never source.
 .dist/
-generated/
 skills/
 commands/

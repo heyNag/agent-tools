@@ -16,7 +16,7 @@ Rules for future AI agents working in this repo:
 - When adding a package, declare targets in `packages/<name>/tool.json`; the
   scripts iterate manifests.
 - Treat `.claude-plugin/marketplace.json`, `skillshare-hub.json`, `skills/`,
-  and `commands/` as generated indexes. Refresh them with `make build-packages`.
+  and `commands/` as maintained indexes. Refresh them with `make build-packages`.
 - Do not edit through root `skills/` or `commands/` symlinks. Edit
   `packages/<name>` source files instead.
 - Keep skill frontmatter tags aligned with `tool.json` tags.

@@ -24,7 +24,7 @@ packages/<name>/commands/        optional Claude Code slash commands
 skills/<name>                    root symlink index for Codex/Cursor/OpenCode
 commands/*.md                    root symlink index for umbrella Claude commands
 .claude-plugin/marketplace.json  Claude Code marketplace catalog
-.claude-plugin/plugin.json       optional root/umbrella Claude plugin metadata
+.claude-plugin/plugin.json       root/umbrella Claude plugin metadata
 .codex-plugin/plugin.json        Codex plugin metadata
 .cursor-plugin/plugin.json       Cursor plugin metadata
 .opencode/plugins/agent-tools.js OpenCode plugin wrapper
@@ -87,14 +87,19 @@ Local development shortcut:
 Cursor support is exposed through `.cursor-plugin/plugin.json`, which points at
 the root `skills/` symlink index.
 
-If your Cursor version does not support git plugin installs yet, use the direct
-skill folder copy pattern for the skill target Cursor supports:
+Use a checkout-based Cursor plugin flow by pointing Cursor at this repo root.
+The manifest reads skills through `./skills/`, which is maintained as symlinks
+to package source:
 
 ```sh
 git clone https://github.com/heyNag/agent-tools.git
 cd agent-tools
 make build-root-indexes
 ```
+
+If your Cursor version expects manually copied skills instead, copy
+`packages/<name>/skills/<name>` into the skill location that Cursor documents
+for that version.
 
 ## Install For OpenCode
 

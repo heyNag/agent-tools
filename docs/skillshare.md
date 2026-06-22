@@ -61,14 +61,14 @@ make build-packages
 make public-check
 ```
 
-## Duplicate Search Results
+## Search Results
 
-This repo no longer commits per-target `generated/` copies. GitHub search
-should primarily find the source skill files under `packages/*/skills/*`.
+Use the hub search when you want the curated public skill list. The hub points
+at canonical source skill files under `packages/*/skills/*`.
 
-If a local or external search tool shows stale generated paths, refresh the repo
-checkout and make sure `.skillignore` hides `.dist/`, `generated/`, `skills/`,
-and `commands/`.
+`.skillignore` hides `.dist/`, `skills/`, and `commands/` so local Skillshare
+discovery does not index build artifacts or root symlink indexes as separate
+skills.
 
 ## Update Flow
 

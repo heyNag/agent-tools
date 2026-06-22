@@ -52,8 +52,9 @@ folders under ignored `.dist/` with `make build-packages`; do not commit them.
 ## Optional Skillshare Discovery
 
 Keep Skillshare discovery source-first. `skillshare-hub.json` points to
-`packages/<name>/skills/<name>`. `.skillignore` hides `.dist/` and defensive
-local generated leftovers.
+`packages/<name>/skills/<name>`. `.skillignore` hides `.dist/` local artifacts
+and the root `skills/` and `commands/` symlink indexes so discovery stays on
+canonical package source.
 
 ## Package Manifests
 

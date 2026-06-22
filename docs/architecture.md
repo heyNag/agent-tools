@@ -67,7 +67,7 @@ and points to `./packages/<name>`. `skillshare-hub.json` is generated from
 Root plugin wrappers use the symlink indexes:
 
 ```text
-.claude-plugin/plugin.json       optional umbrella Claude plugin metadata
+.claude-plugin/plugin.json       umbrella Claude plugin metadata
 .codex-plugin/plugin.json        skills: ./skills/
 .cursor-plugin/plugin.json       skills: ./skills/
 .opencode/plugins/agent-tools.js registers ./skills/
@@ -101,11 +101,10 @@ Edit source paths:
 
 ```text
 packages/<name>/
-skills/
-commands/
 scripts/
 docs/
 ```
 
-Installed copies, `.dist/` artifacts, local auth state, and run artifacts are
-not source of truth.
+The root `skills/` and `commands/` directories are symlink indexes maintained
+by `make build-packages`; do not edit through them. Installed copies, `.dist/`
+artifacts, local auth state, and run artifacts are not source of truth.
