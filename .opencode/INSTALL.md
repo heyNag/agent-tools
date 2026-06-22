@@ -1,10 +1,10 @@
-# Installing agent-tools for OpenCode
+# Installing Charms for OpenCode
 
 OpenCode can install this repo as a git-backed plugin:
 
 ```json
 {
-  "plugin": ["agent-tools@git+https://github.com/heyNag/agent-tools.git"]
+  "plugin": ["charms@git+https://github.com/heyNag/charms.git"]
 }
 ```
 

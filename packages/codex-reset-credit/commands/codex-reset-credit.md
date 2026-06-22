@@ -4,7 +4,7 @@ argument-hint: "[--json] [--no-live] [--thread-id THREAD]"
 allowed-tools: [Bash, Read]
 ---
 
-<!-- agent-tools-managed: codex-reset-credit command -->
+<!-- charms-managed: codex-reset-credit command -->
 
 Use the `codex-reset-credit` skill with the user's arguments: $ARGUMENTS
 

@@ -4,7 +4,7 @@ argument-hint: <video-url-or-path> [expected behavior]
 allowed-tools: [Bash, Read]
 ---
 
-<!-- agent-tools-managed: watch-video command -->
+<!-- charms-managed: watch-video command -->
 
 Use `watch-video` on the UI bug recording: $ARGUMENTS
 

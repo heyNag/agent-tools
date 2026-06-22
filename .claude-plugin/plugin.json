@@ -1,12 +1,12 @@
 {
-  "name": "agent-tools",
+  "name": "charms",
   "description": "Agent skills for video inspection, Codex quota checks, X/Twitter bookmarks, and ChatGPT Pro review.",
   "version": "0.1.0",
   "author": {
     "name": "Nagarjuna Boddu"
   },
-  "homepage": "https://github.com/heyNag/agent-tools",
-  "repository": "https://github.com/heyNag/agent-tools",
+  "homepage": "https://github.com/heyNag/charms",
+  "repository": "https://github.com/heyNag/charms",
   "license": "MIT",
   "keywords": [
     "skills",

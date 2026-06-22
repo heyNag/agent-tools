@@ -1,13 +1,13 @@
 {
-  "name": "agent-tools",
+  "name": "charms",
   "version": "0.1.0",
   "description": "Agent skills for video inspection, Codex quota checks, X/Twitter bookmarks, and ChatGPT Pro review.",
   "author": {
     "name": "Nagarjuna Boddu",
     "url": "https://github.com/heyNag"
   },
-  "homepage": "https://github.com/heyNag/agent-tools",
-  "repository": "https://github.com/heyNag/agent-tools",
+  "homepage": "https://github.com/heyNag/charms",
+  "repository": "https://github.com/heyNag/charms",
   "license": "MIT",
   "keywords": [
     "skills",
@@ -19,9 +19,9 @@
   ],
   "skills": "./skills/",
   "interface": {
-    "displayName": "Agent Tools",
+    "displayName": "Charms",
     "shortDescription": "Local skills for video, quota, bookmarks, and review",
-    "longDescription": "Use agent-tools skills to inspect short videos, check Codex reset-credit status, fetch or digest X/Twitter bookmarks, and prepare scoped ChatGPT Pro review packets.",
+    "longDescription": "Use Charms skills to inspect short videos, check Codex reset-credit status, fetch or digest X/Twitter bookmarks, and prepare scoped ChatGPT Pro review packets.",
     "developerName": "Nagarjuna Boddu",
     "category": "Productivity",
     "capabilities": [
@@ -34,6 +34,6 @@
       "Digest my latest X/Twitter bookmarks.",
       "Use chatgpt-pro-review to review this implementation."
     ],
-    "websiteURL": "https://github.com/heyNag/agent-tools"
+    "websiteURL": "https://github.com/heyNag/charms"
   }
 }

@@ -14,7 +14,7 @@ if str(SCRIPT_DIR) not in sys.path:
 from skill_metadata import invalid_tags, load_json, normalized_tags, read_frontmatter
 
 
-DEFAULT_HUB_SOURCE_PATH = "heyNag/agent-tools"
+DEFAULT_HUB_SOURCE_PATH = "heyNag/charms"
 
 
 def validate_package(root: Path, tool_path: Path) -> list[str]:

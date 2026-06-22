@@ -17,10 +17,10 @@ flowchart TD
   S --> RSI["root skills/ symlink index"]
   CMD --> RCI["root commands/ symlink index"]
 
-  P --> CC["Claude Code<br/>/plugin install <name>@agent-tools"]
+  P --> CC["Claude Code<br/>/plugin install <name>@charms"]
   RSI --> CUR["Cursor<br/>.cursor-plugin/plugin.json"]
   RSI --> CXPLUG["Codex plugin<br/>.codex-plugin/plugin.json"]
-  RSI --> OCPLUG["OpenCode plugin<br/>.opencode/plugins/agent-tools.js"]
+  RSI --> OCPLUG["OpenCode plugin<br/>.opencode/plugins/charms.js"]
   S --> CX["Codex<br/>copy skills/<name>"]
   S --> OC["OpenCode / generic<br/>copy skills/<name>"]
   S --> SH["Skillshare Hub<br/>source packages/<name>/skills/<name>"]

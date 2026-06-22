@@ -1,7 +1,9 @@
-# agent-tools
+# Charms
 
-`agent-tools` is a public workspace for portable agent skills, Claude Code
-plugins, helper commands, and local workflow scripts.
+`charms` is a public workspace for practical, installable charms: portable
+agent skills, Claude Code plugins, helper commands, and local workflow scripts.
+
+Practical charms for coding agents.
 
 ## Skills
 
@@ -85,13 +87,13 @@ differences, start with [docs/README.md](docs/README.md).
 GitHub/Search URL:
 
 ```text
-https://github.com/heyNag/agent-tools
+https://github.com/heyNag/charms
 ```
 
 Skillshare Hub URL:
 
 ```text
-https://raw.githubusercontent.com/heyNag/agent-tools/main/skillshare-hub.json
+https://raw.githubusercontent.com/heyNag/charms/main/skillshare-hub.json
 ```
 
 ## Security

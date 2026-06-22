@@ -1,10 +1,10 @@
 # Decisions
 
-Architecture decisions for `agent-tools`.
+Architecture decisions for `charms`.
 
 ## Repository Scope
 
-Use `agent-tools` as the repo name and scope. The repo holds skills, commands,
+Use `charms` as the repo name and scope. The repo holds skills, commands,
 helper scripts, Claude Code plugins, and optional Skillshare discovery.
 
 ## Source-Only Packages
@@ -26,7 +26,7 @@ metadata:
 .claude-plugin/plugin.json
 .codex-plugin/plugin.json
 .cursor-plugin/plugin.json
-.opencode/plugins/agent-tools.js
+.opencode/plugins/charms.js
 ```
 
 These wrappers point at `skills/`, a symlink index generated from

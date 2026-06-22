@@ -1,6 +1,6 @@
 # Architecture
 
-`agent-tools` is a public source-only workspace for agent skills, Claude Code
+`charms` is a public source-only workspace for agent skills, Claude Code
 plugins, optional Skillshare discovery, and helper scripts.
 
 ## Repo Shape
@@ -71,7 +71,7 @@ Root plugin wrappers use the symlink indexes:
 .claude-plugin/plugin.json       umbrella Claude plugin metadata
 .codex-plugin/plugin.json        skills: ./skills/
 .cursor-plugin/plugin.json       skills: ./skills/
-.opencode/plugins/agent-tools.js registers ./skills/
+.opencode/plugins/charms.js registers ./skills/
 ```
 
 The symlink indexes are maintained by `make build-root-indexes`, which is also

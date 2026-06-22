@@ -4,7 +4,7 @@ argument-hint: "[plan|implementation|pr|eval] [context]"
 allowed-tools: [Bash, Read, Grep]
 ---
 
-<!-- agent-tools-managed: chatgpt-pro-review command -->
+<!-- charms-managed: chatgpt-pro-review command -->
 
 Use the `chatgpt-pro-review` skill with the user's arguments: $ARGUMENTS
 

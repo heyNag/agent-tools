@@ -4,8 +4,8 @@ description: Use when the user explicitly asks about Codex reset credits, credit
 argument-hint: "[--json] [--no-live] [--thread-id THREAD]"
 tags: codex, quota, credits, local, safe
 allowed-tools: Bash, Read
-homepage: https://github.com/heyNag/agent-tools
-repository: https://github.com/heyNag/agent-tools
+homepage: https://github.com/heyNag/charms
+repository: https://github.com/heyNag/charms
 author: Nagarjuna Boddu
 license: MIT
 user-invocable: true

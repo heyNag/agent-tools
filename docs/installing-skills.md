@@ -23,7 +23,7 @@ For skill-specific requirements and examples, read:
 | Claude Code | Install from the Claude Code marketplace catalog. |
 | Codex | Copy `packages/<name>/skills/<name>` into `~/.codex/skills/<name>`. |
 | Cursor | Use `.cursor-plugin/plugin.json`, which points at the root `skills/` symlink index. |
-| OpenCode | Use `.opencode/plugins/agent-tools.js` or copy the skill folder. |
+| OpenCode | Use `.opencode/plugins/charms.js` or copy the skill folder. |
 | Claude Desktop / claude.ai | Build a local `.dist/claude/custom-skills/<name>` folder and upload a ZIP. |
 | Skillshare | Use the optional hub or direct package skill path. |
 
@@ -32,16 +32,16 @@ For skill-specific requirements and examples, read:
 Add the marketplace once:
 
 ```text
-/plugin marketplace add heyNag/agent-tools
+/plugin marketplace add heyNag/charms
 ```
 
 Install the skill you want:
 
 ```text
-/plugin install watch-video@agent-tools
-/plugin install codex-reset-credit@agent-tools
-/plugin install x-bookmarks@agent-tools
-/plugin install chatgpt-pro-review@agent-tools
+/plugin install watch-video@charms
+/plugin install codex-reset-credit@charms
+/plugin install x-bookmarks@charms
+/plugin install chatgpt-pro-review@charms
 ```
 
 Invoke:
@@ -54,15 +54,15 @@ Invoke:
 ```
 
 If command names differ in your Claude Code version, run `/plugin list` or
-`/plugin details <name>@agent-tools`.
+`/plugin details <name>@charms`.
 
 ## Codex
 
 Clone or update the repo, then copy the skill folder:
 
 ```sh
-git clone https://github.com/heyNag/agent-tools.git
-cd agent-tools
+git clone https://github.com/heyNag/charms.git
+cd charms
 SKILL=watch-video
 mkdir -p ~/.codex/skills
 rm -rf "$HOME/.codex/skills/$SKILL"
@@ -85,8 +85,8 @@ manifest at `.cursor-plugin/plugin.json` reads skills from the root `skills/`
 symlink index.
 
 ```sh
-git clone https://github.com/heyNag/agent-tools.git
-cd agent-tools
+git clone https://github.com/heyNag/charms.git
+cd charms
 make build-root-indexes
 ```
 
@@ -100,7 +100,7 @@ Plugin install:
 
 ```json
 {
-  "plugin": ["agent-tools@git+https://github.com/heyNag/agent-tools.git"]
+  "plugin": ["charms@git+https://github.com/heyNag/charms.git"]
 }
 ```
 
@@ -109,8 +109,8 @@ Restart OpenCode after editing `opencode.json`.
 Direct copy fallback:
 
 ```sh
-git clone https://github.com/heyNag/agent-tools.git
-cd agent-tools
+git clone https://github.com/heyNag/charms.git
+cd charms
 SKILL=watch-video
 mkdir -p ~/.config/opencode/skills
 rm -rf "$HOME/.config/opencode/skills/$SKILL"
@@ -123,8 +123,8 @@ Claude custom skills use lowercase `skill.md`, so this repo builds local
 upload artifacts under ignored `.dist/`:
 
 ```sh
-git clone https://github.com/heyNag/agent-tools.git
-cd agent-tools
+git clone https://github.com/heyNag/charms.git
+cd charms
 make build-packages
 SKILL=watch-video
 cd .dist/claude/custom-skills
@@ -139,7 +139,7 @@ ZIP files.
 Hub URL:
 
 ```text
-https://raw.githubusercontent.com/heyNag/agent-tools/main/skillshare-hub.json
+https://raw.githubusercontent.com/heyNag/charms/main/skillshare-hub.json
 ```
 
 In the Skillshare web UI, use `Search > Hub`, add/select that hub URL, then
@@ -148,10 +148,10 @@ search for `watch`, `codex`, `bookmarks`, or another keyword.
 Direct CLI install:
 
 ```sh
-skillshare install heyNag/agent-tools/packages/watch-video/skills/watch-video --track
-skillshare install heyNag/agent-tools/packages/codex-reset-credit/skills/codex-reset-credit --track
-skillshare install heyNag/agent-tools/packages/x-bookmarks/skills/x-bookmarks --track
-skillshare install heyNag/agent-tools/packages/chatgpt-pro-review/skills/chatgpt-pro-review --track
+skillshare install heyNag/charms/packages/watch-video/skills/watch-video --track
+skillshare install heyNag/charms/packages/codex-reset-credit/skills/codex-reset-credit --track
+skillshare install heyNag/charms/packages/x-bookmarks/skills/x-bookmarks --track
+skillshare install heyNag/charms/packages/chatgpt-pro-review/skills/chatgpt-pro-review --track
 skillshare sync
 ```
 

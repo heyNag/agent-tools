@@ -73,7 +73,7 @@ tagged:
 
 | Target | User update process |
 |---|---|
-| Claude Code | Reinstall/update the plugin from the marketplace if Claude Code offers an update flow. If unsure, run `/plugin list`, `/plugin details <name>@agent-tools`, then reinstall with `/plugin install <name>@agent-tools`. |
+| Claude Code | Reinstall/update the plugin from the marketplace if Claude Code offers an update flow. If unsure, run `/plugin list`, `/plugin details <name>@charms`, then reinstall with `/plugin install <name>@charms`. |
 | Codex | Pull the repo and copy `packages/<name>/skills/<name>` into `~/.codex/skills/<name>`. |
 | Cursor | Update the repo/plugin checkout. The Cursor manifest points at the root `skills/` symlink index. |
 | OpenCode | Pull the repo and copy `packages/<name>/skills/<name>` into `~/.config/opencode/skills/<name>` or the configured skill path. |

@@ -134,7 +134,7 @@ def api_get(path: str, token: str, params: dict[str, str] | None = None) -> tupl
         url,
         headers={
             "Authorization": f"Bearer {token}",
-            "User-Agent": "agent-tools-x-bookmarks/1.0",
+            "User-Agent": "charms-x-bookmarks/1.0",
         },
     )
     try:

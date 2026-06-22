@@ -20,12 +20,12 @@ packages/chatgpt-pro-review/skills/chatgpt-pro-review
 
 ## Install Targets
 
-- Claude Code: `/plugin install chatgpt-pro-review@agent-tools`
+- Claude Code: `/plugin install chatgpt-pro-review@charms`
 - Codex: copy `packages/chatgpt-pro-review/skills/chatgpt-pro-review`
 - Cursor: root `skills/chatgpt-pro-review` symlink through `.cursor-plugin/plugin.json`
 - OpenCode: root plugin wrapper or copy `packages/chatgpt-pro-review/skills/chatgpt-pro-review`
 - Claude Desktop: build `.dist/claude/custom-skills/chatgpt-pro-review`
-- Skillshare: install `heyNag/agent-tools/packages/chatgpt-pro-review/skills/chatgpt-pro-review`
+- Skillshare: install `heyNag/charms/packages/chatgpt-pro-review/skills/chatgpt-pro-review`
 
 ## Privacy Model
 

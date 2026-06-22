@@ -1,6 +1,6 @@
 # Agent Compatibility
 
-`agent-tools` keeps skill instructions portable and maps installation per
+`charms` keeps skill instructions portable and maps installation per
 target.
 
 ## Source Pattern
@@ -28,11 +28,11 @@ commands/*.md -> ../packages/<name>/commands/*.md
 Claude Code:
 
 ```text
-/plugin marketplace add heyNag/agent-tools
-/plugin install watch-video@agent-tools
-/plugin install codex-reset-credit@agent-tools
-/plugin install x-bookmarks@agent-tools
-/plugin install chatgpt-pro-review@agent-tools
+/plugin marketplace add heyNag/charms
+/plugin install watch-video@charms
+/plugin install codex-reset-credit@charms
+/plugin install x-bookmarks@charms
+/plugin install chatgpt-pro-review@charms
 ```
 
 Codex:
@@ -54,7 +54,7 @@ OpenCode:
 
 ```json
 {
-  "plugin": ["agent-tools@git+https://github.com/heyNag/agent-tools.git"]
+  "plugin": ["charms@git+https://github.com/heyNag/charms.git"]
 }
 ```
 
@@ -81,7 +81,7 @@ zip -r chatgpt-pro-review.zip chatgpt-pro-review
 Skillshare:
 
 ```text
-https://raw.githubusercontent.com/heyNag/agent-tools/main/skillshare-hub.json
+https://raw.githubusercontent.com/heyNag/charms/main/skillshare-hub.json
 ```
 
 ## Runtime Boundary

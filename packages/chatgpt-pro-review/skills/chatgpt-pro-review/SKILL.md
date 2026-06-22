@@ -4,8 +4,8 @@ description: Use when the user asks for ChatGPT Pro review, Extended Pro review,
 argument-hint: "[plan|implementation|pr|eval] [context]"
 tags: review, chatgpt, pro, planning, code-review
 allowed-tools: Read, Grep, Bash
-homepage: https://github.com/heyNag/agent-tools
-repository: https://github.com/heyNag/agent-tools
+homepage: https://github.com/heyNag/charms
+repository: https://github.com/heyNag/charms
 ---
 
 # ChatGPT Pro Review

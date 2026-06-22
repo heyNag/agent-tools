@@ -31,8 +31,8 @@ root = pathlib.Path(sys.argv[2])
 data = json.loads(marketplace_path.read_text(encoding="utf-8"))
 
 errors = []
-if data.get("name") != "agent-tools":
-    errors.append("marketplace name must be agent-tools")
+if data.get("name") != "charms":
+    errors.append("marketplace name must be charms")
 owner = data.get("owner")
 if not isinstance(owner, dict) or not isinstance(owner.get("name"), str) or not owner["name"]:
     errors.append("marketplace owner.name must be present")
@@ -120,8 +120,8 @@ data = json.loads(hub_path.read_text(encoding="utf-8"))
 errors = []
 if data.get("schemaVersion") != 1:
     errors.append("skillshare hub schemaVersion must be 1")
-if data.get("sourcePath") != "heyNag/agent-tools":
-    errors.append("skillshare hub sourcePath must be heyNag/agent-tools")
+if data.get("sourcePath") != "heyNag/charms":
+    errors.append("skillshare hub sourcePath must be heyNag/charms")
 
 skills = data.get("skills")
 if not isinstance(skills, list) or not skills:
@@ -246,12 +246,12 @@ if cursor.get("skills") != "./skills/":
     errors.append(".cursor-plugin/plugin.json: skills must be ./skills/")
 
 package_json = load(root / "package.json")
-if package_json.get("main") != ".opencode/plugins/agent-tools.js":
-    errors.append("package.json: main must be .opencode/plugins/agent-tools.js")
+if package_json.get("main") != ".opencode/plugins/charms.js":
+    errors.append("package.json: main must be .opencode/plugins/charms.js")
 if package_json.get("type") != "module":
     errors.append("package.json: type must be module for the OpenCode plugin")
-if not (root / ".opencode" / "plugins" / "agent-tools.js").is_file():
-    errors.append("missing file: .opencode/plugins/agent-tools.js")
+if not (root / ".opencode" / "plugins" / "charms.js").is_file():
+    errors.append("missing file: .opencode/plugins/charms.js")
 
 if errors:
     for error in errors:

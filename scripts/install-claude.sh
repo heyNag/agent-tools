@@ -4,7 +4,7 @@ set -euo pipefail
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 skills_root="${HOME}/.claude/skills"
 commands_target="${HOME}/.claude/commands"
-marker_name=".agent-tools-managed"
+marker_name=".charms-managed"
 
 run() {
   if [[ "${DRY_RUN:-0}" == "1" ]]; then
@@ -36,7 +36,7 @@ write_marker() {
   if [[ "${DRY_RUN:-0}" == "1" ]]; then
     printf '[dry-run] write managed marker %q\n' "${target}"
   else
-    printf 'managed-by=agent-tools\npackage=%s\nsource=%s\n' "${package}" "${repo_root}/packages/${package}/skills/${package}" > "${target}"
+    printf 'managed-by=charms\npackage=%s\nsource=%s\n' "${package}" "${repo_root}/packages/${package}/skills/${package}" > "${target}"
   fi
 }
 
@@ -67,7 +67,7 @@ EOF
 ensure_managed_file() {
   local target="$1"
   local package="$2"
-  local command_marker="agent-tools-managed: ${package} command"
+  local command_marker="charms-managed: ${package} command"
   if [[ ! -e "${target}" ]]; then
     return
   fi

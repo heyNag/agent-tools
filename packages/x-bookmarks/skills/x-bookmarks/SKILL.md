@@ -4,8 +4,8 @@ description: Use when the user asks to fetch, search, review, summarize, digest,
 argument-hint: "[digest|search QUERY|folders|since-last] [--count N]"
 tags: x, twitter, bookmarks, bird, local
 allowed-tools: Bash, Read
-homepage: https://github.com/heyNag/agent-tools
-repository: https://github.com/heyNag/agent-tools
+homepage: https://github.com/heyNag/charms
+repository: https://github.com/heyNag/charms
 author: Nagarjuna Boddu
 license: MIT
 user-invocable: true

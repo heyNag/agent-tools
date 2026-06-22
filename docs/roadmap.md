@@ -38,7 +38,7 @@ If useful, make a future `mcp/<name>` server deployable to Railway or a similar
 platform. Deployment should build on an independent MCP folder shape, not on a
 gateway.
 
-## Phase 6: More Agent Tools
+## Phase 6: More Charms
 
 Add more packages only when they have a clear local workflow or agent need. New
 packages should follow `docs/adding-a-skill.md`.

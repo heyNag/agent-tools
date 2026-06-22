@@ -15,7 +15,7 @@ import sys
 ROOT = pathlib.Path(sys.argv[1])
 OUT = pathlib.Path(sys.argv[2])
 DEFAULT_AUTHOR = {"name": "Nagarjuna Boddu"}
-DEFAULT_REPOSITORY = "https://github.com/heyNag/agent-tools"
+DEFAULT_REPOSITORY = "https://github.com/heyNag/charms"
 DEFAULT_LICENSE = "MIT"
 DEFAULT_VERSION = "0.1.0"
 
@@ -63,8 +63,8 @@ for tool_path in sorted((ROOT / "packages").glob("*/tool.json")):
     )
 
 marketplace = {
-    "name": "agent-tools",
-    "description": "Claude Code plugins from agent-tools.",
+    "name": "charms",
+    "description": "Claude Code plugins from Charms.",
     "owner": DEFAULT_AUTHOR,
     "plugins": plugins,
 }

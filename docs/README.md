@@ -1,7 +1,7 @@
-# Agent Tools Docs
+# Charms Docs
 
 This `docs/` folder is the canonical orientation guide for future humans and AI
-agents working in `agent-tools`. The root README is the front door; these files
+agents working in `charms`. The root README is the front door; these files
 carry the project shape, constraints, and workflows.
 
 Before structural changes, read:

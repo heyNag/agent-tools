@@ -36,12 +36,12 @@ frames/
 Full install commands for each target are in
 [`installing-skills.md`](installing-skills.md).
 
-- Claude Code: `/plugin install watch-video@agent-tools`
+- Claude Code: `/plugin install watch-video@charms`
 - Codex: copy `packages/watch-video/skills/watch-video`
 - Cursor: root `skills/watch-video` symlink through `.cursor-plugin/plugin.json`
 - OpenCode: root plugin wrapper or copy `packages/watch-video/skills/watch-video`
 - Claude Desktop: build `.dist/claude/custom-skills/watch-video`
-- Skillshare: install `heyNag/agent-tools/packages/watch-video/skills/watch-video`
+- Skillshare: install `heyNag/charms/packages/watch-video/skills/watch-video`
 
 ## Requirements
 

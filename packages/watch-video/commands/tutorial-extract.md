@@ -4,7 +4,7 @@ argument-hint: <video-url-or-path> [focus]
 allowed-tools: [Bash, Read]
 ---
 
-<!-- agent-tools-managed: watch-video command -->
+<!-- charms-managed: watch-video command -->
 
 Use `watch-video` on the tutorial source: $ARGUMENTS
 

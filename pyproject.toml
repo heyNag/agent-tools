@@ -1,7 +1,7 @@
 [project]
-name = "agent-tools"
+name = "charms"
 version = "0.1.0"
-description = "Public agent tooling workspace for skills, commands, and Claude Code plugins."
+description = "Public workspace of practical, installable charms: agent skills, commands, and Claude Code plugins."
 requires-python = ">=3.11"
 license = { text = "MIT" }
 authors = [

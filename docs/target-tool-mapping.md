@@ -1,6 +1,6 @@
 # Target Tool Mapping
 
-`agent-tools` keeps skill instructions agent-agnostic where practical. Source
+`charms` keeps skill instructions agent-agnostic where practical. Source
 skills describe actions and evidence needs; each target maps those actions to
 its own tools and runtime limits.
 
@@ -39,7 +39,7 @@ is target-specific.
 
 | Action | Claude Code | Claude Desktop / claude.ai | Codex | Cursor | OpenCode / generic |
 |---|---|---|---|---|---|
-| Install | `/plugin install <name>@agent-tools` | Upload ZIP built from `.dist/claude/custom-skills/<name>` | Copy `packages/<name>/skills/<name>` or use `.codex-plugin/plugin.json` | Use `.cursor-plugin/plugin.json` | Use `.opencode/plugins/agent-tools.js` or copy `packages/<name>/skills/<name>` |
+| Install | `/plugin install <name>@charms` | Upload ZIP built from `.dist/claude/custom-skills/<name>` | Copy `packages/<name>/skills/<name>` or use `.codex-plugin/plugin.json` | Use `.cursor-plugin/plugin.json` | Use `.opencode/plugins/charms.js` or copy `packages/<name>/skills/<name>` |
 | Skill file | `skills/<name>/SKILL.md` inside package plugin | lowercase `skill.md` in ZIP artifact | top-level `SKILL.md` in copied folder or root `skills/<name>/SKILL.md` symlink | root `skills/<name>/SKILL.md` symlink | root `skills/<name>/SKILL.md` symlink or copied folder |
 | Commands | `packages/<name>/commands/` or root `commands/` symlink index | No slash command wrapper | No slash command wrapper | No slash command wrapper | No slash command wrapper |
 | Local scripts | Best local target with shell access | Only if host exposes local tools | Best local target with shell access | Depends on Cursor runtime permissions | Best local target with shell access |

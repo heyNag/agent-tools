@@ -4,7 +4,7 @@ argument-hint: "[digest|search QUERY|folders|since-last] [--count N]"
 allowed-tools: [Bash, Read]
 ---
 
-<!-- agent-tools-managed: x-bookmarks command -->
+<!-- charms-managed: x-bookmarks command -->
 
 Use the `x-bookmarks` skill with the user's arguments: $ARGUMENTS
 

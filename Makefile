@@ -20,8 +20,8 @@ syntax:
 	@files="$$(find packages scripts -path '*/__pycache__' -prune -o -name '*.py' -print)"; \
 	PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-python-syntax.py $$files
 	bash -n scripts/*.sh packages/*/skills/*/scripts/*.sh
-	@if command -v node >/dev/null 2>&1 && [ -f .opencode/plugins/agent-tools.js ]; then \
-		node --check .opencode/plugins/agent-tools.js; \
+	@if command -v node >/dev/null 2>&1 && [ -f .opencode/plugins/charms.js ]; then \
+		node --check .opencode/plugins/charms.js; \
 	fi
 
 doctor:

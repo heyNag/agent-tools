@@ -3,7 +3,7 @@ set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 skills_root="${HOME}/.codex/skills"
-marker_name=".agent-tools-managed"
+marker_name=".charms-managed"
 
 run() {
   if [[ "${DRY_RUN:-0}" == "1" ]]; then
@@ -35,7 +35,7 @@ write_marker() {
   if [[ "${DRY_RUN:-0}" == "1" ]]; then
     printf '[dry-run] write managed marker %q\n' "${target}"
   else
-    printf 'managed-by=agent-tools\npackage=%s\nsource=%s\n' "${package}" "${repo_root}/packages/${package}/skills/${package}" > "${target}"
+    printf 'managed-by=charms\npackage=%s\nsource=%s\n' "${package}" "${repo_root}/packages/${package}/skills/${package}" > "${target}"
   fi
 }
 

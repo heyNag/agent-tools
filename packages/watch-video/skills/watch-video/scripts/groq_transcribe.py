@@ -228,7 +228,7 @@ def _post_transcription(
             headers={
                 "Authorization": f"Bearer {key}",
                 "Content-Type": f"multipart/form-data; boundary={boundary}",
-                "User-Agent": "agent-tools-watch-video/0.1",
+                "User-Agent": "charms-watch-video/0.1",
             },
         )
         try:

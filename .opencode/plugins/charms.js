@@ -1,5 +1,5 @@
 /**
- * OpenCode plugin for agent-tools.
+ * OpenCode plugin for Charms.
  *
  * Registers the root skills index without copying package skill sources.
  */
@@ -10,7 +10,7 @@ import { fileURLToPath } from "node:url";
 const pluginDir = path.dirname(fileURLToPath(import.meta.url));
 const skillsDir = path.resolve(pluginDir, "../../skills");
 
-export const AgentToolsPlugin = async () => ({
+export const CharmsPlugin = async () => ({
   config: async (config) => {
     config.skills = config.skills || {};
     config.skills.paths = config.skills.paths || [];
@@ -20,4 +20,4 @@ export const AgentToolsPlugin = async () => ({
   },
 });
 
-export default AgentToolsPlugin;
+export default CharmsPlugin;

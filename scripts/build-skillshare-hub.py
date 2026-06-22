@@ -15,7 +15,7 @@ if str(SCRIPT_DIR) not in sys.path:
 from skill_metadata import load_json, normalized_tags, read_frontmatter
 
 
-DEFAULT_HUB_SOURCE_PATH = "heyNag/agent-tools"
+DEFAULT_HUB_SOURCE_PATH = "heyNag/charms"
 DEFAULT_GENERATED_AT = "1970-01-01T00:00:00Z"
 VERSION_DATE_RE = re.compile(r"^(\d{4})\.(\d{1,2})\.(\d{1,2})(?:\.\d+)?$")
 

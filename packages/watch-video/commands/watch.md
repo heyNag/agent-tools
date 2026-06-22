@@ -4,7 +4,7 @@ argument-hint: <video-url-or-path> [question]
 allowed-tools: [Bash, Read]
 ---
 
-<!-- agent-tools-managed: watch-video command -->
+<!-- charms-managed: watch-video command -->
 
 Use the `watch-video` skill with the user's arguments: $ARGUMENTS
 

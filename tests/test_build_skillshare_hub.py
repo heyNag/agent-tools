@@ -66,7 +66,7 @@ class BuildSkillshareHubTests(unittest.TestCase):
 
         self.assertEqual(index["schemaVersion"], 1)
         self.assertEqual(index["generatedAt"], "2026-06-21T00:00:00Z")
-        self.assertEqual(index["sourcePath"], "heyNag/agent-tools")
+        self.assertEqual(index["sourcePath"], "heyNag/charms")
         self.assertEqual([skill["name"] for skill in index["skills"]], ["alpha", "zeta"])
         self.assertEqual(index["skills"][0]["source"], "packages/alpha/skills/alpha")
         self.assertNotIn("skill", index["skills"][0])

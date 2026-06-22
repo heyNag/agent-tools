@@ -6,7 +6,7 @@ primary public install path for this repo.
 ## Hub URL
 
 ```text
-https://raw.githubusercontent.com/heyNag/agent-tools/main/skillshare-hub.json
+https://raw.githubusercontent.com/heyNag/charms/main/skillshare-hub.json
 ```
 
 In the Skillshare web UI:
@@ -23,18 +23,18 @@ the search box is for terms inside that hub.
 ## CLI
 
 ```sh
-skillshare hub add https://raw.githubusercontent.com/heyNag/agent-tools/main/skillshare-hub.json --label agent-tools
-skillshare hub default agent-tools
-skillshare search --hub agent-tools bookmarks
+skillshare hub add https://raw.githubusercontent.com/heyNag/charms/main/skillshare-hub.json --label charms
+skillshare hub default charms
+skillshare search --hub charms bookmarks
 ```
 
 Direct installs use canonical source skill folders:
 
 ```sh
-skillshare install heyNag/agent-tools/packages/watch-video/skills/watch-video --track
-skillshare install heyNag/agent-tools/packages/codex-reset-credit/skills/codex-reset-credit --track
-skillshare install heyNag/agent-tools/packages/x-bookmarks/skills/x-bookmarks --track
-skillshare install heyNag/agent-tools/packages/chatgpt-pro-review/skills/chatgpt-pro-review --track
+skillshare install heyNag/charms/packages/watch-video/skills/watch-video --track
+skillshare install heyNag/charms/packages/codex-reset-credit/skills/codex-reset-credit --track
+skillshare install heyNag/charms/packages/x-bookmarks/skills/x-bookmarks --track
+skillshare install heyNag/charms/packages/chatgpt-pro-review/skills/chatgpt-pro-review --track
 skillshare sync
 ```
 
@@ -51,7 +51,7 @@ packages/*/skills/*/SKILL.md
 It uses:
 
 ```text
-sourcePath: heyNag/agent-tools
+sourcePath: heyNag/charms
 source: packages/<name>/skills/<name>
 ```
 

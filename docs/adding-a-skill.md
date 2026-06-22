@@ -85,7 +85,7 @@ Create `packages/awesome-skill/.claude-plugin/plugin.json`:
   "author": {
     "name": "Nagarjuna Boddu"
   },
-  "repository": "https://github.com/heyNag/agent-tools",
+  "repository": "https://github.com/heyNag/charms",
   "license": "MIT"
 }
 ```
@@ -104,8 +104,8 @@ description: Use when the user asks for awesome-skill help or needs the awesome 
 argument-hint: "[optional args]"
 tags: awesome, local
 allowed-tools: Bash, Read
-homepage: https://github.com/heyNag/agent-tools
-repository: https://github.com/heyNag/agent-tools
+homepage: https://github.com/heyNag/charms
+repository: https://github.com/heyNag/charms
 ---
 
 # Awesome Skill

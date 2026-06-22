@@ -4,8 +4,8 @@ description: Use when the user asks to inspect a YouTube URL, local video, scree
 argument-hint: "<video-url-or-path> [--start T] [--end T] [question]"
 tags: video, youtube, transcription, frames, local
 allowed-tools: Bash, Read
-homepage: https://github.com/heyNag/agent-tools
-repository: https://github.com/heyNag/agent-tools
+homepage: https://github.com/heyNag/charms
+repository: https://github.com/heyNag/charms
 author: Nagarjuna Boddu
 license: MIT
 user-invocable: true

@@ -1,6 +1,6 @@
 # Package Shape
 
-`agent-tools` uses packages as the durable source boundary.
+`charms` uses packages as the durable source boundary.
 
 ```text
 packages/<name>/
