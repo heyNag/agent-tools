@@ -39,10 +39,9 @@ Do not add a duplicate root-level `packages/<name>/SKILL.md`.
 ## Why `packages/` Instead Of Top-Level `skills/`
 
 The repo contains more than standalone skills. A package also needs Claude Code
-plugin metadata, optional commands, tests, package docs, and future MCP
-association. Keeping that bundle under `packages/<name>` makes the ownership
-boundary clear while still exposing a standard `skills/<name>/SKILL.md` folder
-inside the package.
+plugin metadata, optional commands, tests, and package docs. Keeping that bundle
+under `packages/<name>` makes the ownership boundary clear while still exposing
+a standard `skills/<name>/SKILL.md` folder inside the package.
 
 ## Source-Only Distribution
 

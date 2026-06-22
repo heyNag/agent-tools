@@ -5,6 +5,6 @@
   "targets": ["claude", "codex", "generic"],
   "surfaces": ["claude-code", "claude-desktop", "codex", "opencode"],
   "agent_agnostic": true,
-  "has_mcp": true,
+  "has_mcp": false,
   "public": true
 }

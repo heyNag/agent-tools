@@ -25,16 +25,18 @@ and fallback behavior when native captions are incomplete or unavailable.
 Improve commands, install docs, target mapping, and troubleshooting. Keep local
 installed copies downstream of package source.
 
-## Phase 4: Real MCP Tools
+## Phase 4: Real MCP Tools, If Needed
 
-When the local package surface is stable, add real tools under
-`mcp/watch-video`, such as `video_info`, `video_analyze`, `video_watch`, and
-`video_detail`.
+There is no MCP folder today. If a real agent workflow needs server-side tools,
+add a focused `mcp/<name>` folder with actual tools, tests, and deployment docs.
+For `watch-video`, possible future tools could include `video_info`,
+`video_analyze`, `video_watch`, and `video_detail`.
 
 ## Phase 5: Optional Deployment
 
-If useful, make `mcp/watch-video` deployable to Railway or a similar platform.
-Deployment should build on the independent MCP folder shape, not on a gateway.
+If useful, make a future `mcp/<name>` server deployable to Railway or a similar
+platform. Deployment should build on an independent MCP folder shape, not on a
+gateway.
 
 ## Phase 6: More Agent Tools
 

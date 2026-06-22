@@ -84,5 +84,4 @@ bash -lc 'set -a; source .env.local >/dev/null 2>&1; set +a; python3 packages/wa
 - better visual report summaries
 - configurable transcript providers
 - robust caption fallback diagnostics
-- real MCP tools later: `video_info`, `video_analyze`, `video_watch`,
-  `video_detail`
+- real MCP tools later only if there is a concrete server-side workflow

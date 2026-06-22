@@ -1,4 +1,4 @@
-.PHONY: test syntax doctor install install-dry-run groq-test mcp-build clean-artifacts build-marketplace build-skillshare-hub build-claude-custom-skill build-packages verify-skill-metadata verify-packages verify-source-clean public-check ci-local
+.PHONY: test syntax doctor install install-dry-run groq-test clean-artifacts build-marketplace build-skillshare-hub build-claude-custom-skill build-packages verify-skill-metadata verify-packages verify-source-clean public-check ci-local
 
 AUDIO ?=
 PYTHON ?= python3
@@ -36,9 +36,6 @@ groq-test:
 	fi
 	./scripts/test-groq.sh "$(AUDIO)"
 
-mcp-build:
-	npm --prefix mcp/watch-video run build
-
 clean-artifacts:
 	rm -rf .dist
 
@@ -74,7 +71,6 @@ verify-source-clean:
 public-check:
 	$(MAKE) test
 	$(MAKE) syntax
-	$(MAKE) mcp-build
 	$(MAKE) clean-artifacts
 	$(MAKE) build-packages
 	$(MAKE) verify-skill-metadata

@@ -48,5 +48,4 @@ Codex auth/session files
 X/Twitter cookies or OAuth tokens
 node_modules/
 .venv/
-mcp/*/dist/
 ```

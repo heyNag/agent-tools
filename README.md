@@ -1,7 +1,7 @@
 # agent-tools
 
 `agent-tools` is a public workspace for agent skills, commands, helper scripts,
-Claude Code plugins, optional Skillshare discovery, and future MCP servers.
+Claude Code plugins, and optional Skillshare discovery.
 
 Current public skills:
 
@@ -24,7 +24,6 @@ packages/<name>/commands/        optional Claude Code slash commands
 .claude-plugin/marketplace.json  Claude Code marketplace catalog
 skillshare-hub.json              optional Skillshare hub index
 .dist/                           ignored local build artifacts
-mcp/                             future deployable MCP server shapes
 docs/                            project memory and onboarding docs
 scripts/                         build, install, test, and release helpers
 ```
@@ -187,9 +186,8 @@ git status
 
 `make build-packages` refreshes `.claude-plugin/marketplace.json`,
 `skillshare-hub.json`, and ignored Claude custom-skill artifacts under
-`.dist/`. `make public-check` runs tests, syntax checks, MCP placeholder build,
-package verification, metadata verification, source-index drift checks, and
-install dry-runs.
+`.dist/`. `make public-check` runs tests, syntax checks, package verification,
+metadata verification, source-index drift checks, and install dry-runs.
 
 ## Docs
 
@@ -215,5 +213,5 @@ https://raw.githubusercontent.com/heyNag/agent-tools/main/skillshare-hub.json
 
 Do not commit real API keys, Codex auth/session files, X/Twitter cookies or
 OAuth tokens, `.env.local`, `.watch-video/` artifacts, `.x-bookmarks/` state,
-media files, transcripts, frames, caches, `.dist/`, local virtualenvs, or MCP
-`dist/`/`node_modules/` outputs.
+media files, transcripts, frames, caches, `.dist/`, local virtualenvs, or
+`node_modules/` outputs.

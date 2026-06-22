@@ -1,8 +1,7 @@
 # Architecture
 
 `agent-tools` is a public source-only workspace for agent skills, Claude Code
-plugins, optional Skillshare discovery, helper scripts, and future MCP server
-shapes.
+plugins, optional Skillshare discovery, and helper scripts.
 
 ## Repo Shape
 
@@ -11,7 +10,6 @@ packages/             source packages and Claude Code plugin roots
 .claude-plugin/       Claude Code marketplace catalog
 skillshare-hub.json   optional Skillshare hub index
 .dist/                ignored local build artifacts
-mcp/                  deployable MCP server shapes, one folder per MCP server
 scripts/              install, build, test, and release helpers
 .github/workflows/    CI and manual skill release workflow
 docs/                 orientation and project memory
@@ -69,21 +67,12 @@ make public-check
 
 ## MCP
 
-`mcp/` is for deployable MCP server shapes. The current placeholder is:
+There is no MCP server in the repo today. If a future skill needs real MCP
+tools, add a focused `mcp/<name>` folder in that change and document how it is
+deployed and tested.
 
-```text
-mcp/watch-video
-```
-
-It exposes a status tool only. It does not wrap video processing yet.
-
-Future MCP work can add real tools such as `video_info`, `video_analyze`,
-`video_watch`, and `video_detail` inside `mcp/watch-video`.
-
-## No Gateway
-
-There is no MCP gateway. Do not add a gateway, router, proxy, or shared MCP
-control plane unless explicitly requested.
+Do not add an MCP gateway, router, proxy, or shared MCP control plane unless
+explicitly requested.
 
 There is also no global session-start bootstrap today. Current packages are
 task/domain tools invoked by users, native skill discovery, or agent judgment.
@@ -94,7 +83,6 @@ Edit source paths:
 
 ```text
 packages/<name>/
-mcp/watch-video/
 scripts/
 docs/
 ```

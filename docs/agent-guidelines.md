@@ -11,8 +11,8 @@ Rules for future AI agents working in this repo:
 - Use `.dist/` only for ignored local artifacts such as Claude custom-skill ZIP
   sources.
 - Do not create MCP gateways unless explicitly requested.
-- Keep `mcp/watch-video` as a minimal deployable MCP placeholder until real MCP
-  tools are explicitly requested.
+- Do not add placeholder MCP folders. Add `mcp/<name>` only when real MCP tools
+  are explicitly requested.
 - When adding a package, declare targets in `packages/<name>/tool.json`; the
   scripts iterate manifests.
 - Treat `.claude-plugin/marketplace.json` and `skillshare-hub.json` as generated
@@ -23,7 +23,7 @@ Rules for future AI agents working in this repo:
 - Keep skills agent-agnostic when possible. Put target-specific details in
   docs or target wrappers.
 - Do not commit secrets, local auth files, media, transcripts, frames, `.dist/`,
-  caches, virtualenvs, `node_modules`, or MCP build outputs.
+  caches, virtualenvs, or `node_modules`.
 - Keep CI no-secret and no-live-network beyond normal dependency setup.
 - Add or update tests for behavior changes.
 - Update docs when architecture, workflow, install behavior, or security
@@ -45,7 +45,7 @@ Then verify:
 - No real API keys are staged.
 - `.env.local` is ignored and untracked.
 - No `.watch-video/` or `.x-bookmarks/` state is staged.
-- No `.dist/`, media, transcripts, frames, caches, `.venv/`, `node_modules/`,
-  or MCP `dist/` outputs are staged.
+- No `.dist/`, media, transcripts, frames, caches, `.venv/`, or `node_modules/`
+  are staged.
 - `.claude-plugin/marketplace.json` and `skillshare-hub.json` match package
   source.

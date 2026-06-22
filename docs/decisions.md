@@ -5,8 +5,7 @@ Architecture decisions for `agent-tools`.
 ## Repository Scope
 
 Use `agent-tools` as the repo name and scope. The repo holds skills, commands,
-helper scripts, Claude Code plugins, optional Skillshare discovery, and future
-MCP server shapes.
+helper scripts, Claude Code plugins, and optional Skillshare discovery.
 
 ## Source-Only Packages
 
@@ -17,11 +16,11 @@ generic Agent Skills, and Skillshare use that skill folder directly.
 This avoids committed per-target copies and keeps one editable source path for
 each skill.
 
-## Package And MCP Separation
+## No Current MCP Tree
 
-Keep local package source under `packages/<name>` and MCP server source under
-`mcp/<name>`. Local skill/script packages should not be forced into server
-architecture.
+Keep local package source under `packages/<name>`. Do not keep placeholder MCP
+folders in the repo. Add `mcp/<name>` only when there is a real MCP tool surface
+to implement, test, and document.
 
 ## No MCP Gateway
 
@@ -42,7 +41,7 @@ local generated leftovers.
 ## Package Manifests
 
 Use `packages/<name>/tool.json` to declare public status, install targets, tags,
-and MCP presence. Use `packages/<name>/.claude-plugin/plugin.json` for Claude
+and package traits. Use `packages/<name>/.claude-plugin/plugin.json` for Claude
 plugin metadata and version. Use `SKILL.md` frontmatter for agent-visible
 trigger metadata.
 
@@ -56,7 +55,7 @@ verifies, commits, pushes, and creates a skill-scoped GitHub Release with a tag
 named `<skill>@<version>`.
 
 GitHub Packages are intentionally unused until there is a real package artifact
-such as an npm package, Docker image, binary, or MCP container.
+such as an npm package, Docker image, or binary.
 
 ## Watch Video Defaults
 

@@ -16,10 +16,6 @@ jobs:
         with:
           python-version: "3.11"
 
-      - uses: actions/setup-node@v6
-        with:
-          node-version: "22"
-
       - name: Enforce release-only version bumps
         run: |
           base="${PR_BASE_SHA:-$PUSH_BASE_SHA}"
@@ -35,9 +31,6 @@ jobs:
 
       - name: Syntax check scripts
         run: make syntax
-
-      - name: Build MCP placeholder
-        run: make mcp-build
 
       - name: Build package artifacts and indexes
         run: make build-packages
