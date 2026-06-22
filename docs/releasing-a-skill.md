@@ -73,6 +73,16 @@ The workflow validates the package name by loading
 be manually registered in the workflow; if the package exists and follows the
 repo shape, the workflow can release it.
 
+## Releasing Multiple Skills
+
+Release one skill per run, and trigger them one at a time. The workflow uses a
+single `release-skill` concurrency group, which keeps at most one run queued
+behind the running one — dispatching three or more in quick succession can
+cancel the middle pending run. The push step rebases onto the latest `main` and
+retries if a concurrent release advances the branch, so overlapping runs no
+longer fail with non-fast-forward errors, but sequential triggering is still the
+clean path.
+
 ## What The Workflow Does
 
 1. Computes the next UTC date version.
@@ -83,7 +93,8 @@ repo shape, the workflow can release it.
    verification.
 6. Verifies source indexes are current.
 7. Commits the release metadata.
-8. Pushes to `main`.
+8. Pushes to `main`, rebasing and retrying if a concurrent release advanced the
+   branch.
 9. Creates a GitHub Release tagged `<skill>@<version>`.
 
 ## New Skill Release Readiness
