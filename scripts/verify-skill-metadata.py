@@ -161,9 +161,11 @@ def validate_skillignore(root: Path) -> list[str]:
         for line in path.read_text(encoding="utf-8").splitlines()
         if line.strip() and not line.lstrip().startswith("#")
     ]
-    if ".dist/" not in lines and ".dist" not in lines:
-        return [".skillignore: must include .dist/"]
-    return []
+    errors: list[str] = []
+    for required in [".dist/", "skills/", "commands/"]:
+        if required not in lines and required.rstrip("/") not in lines:
+            errors.append(f".skillignore: must include {required}")
+    return errors
 
 
 def main(argv: list[str] | None = None) -> int:

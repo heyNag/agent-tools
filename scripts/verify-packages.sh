@@ -195,6 +195,71 @@ if errors:
 PY
 }
 
+validate_root_wrappers() {
+  python3 - "$ROOT" <<'PY'
+import json
+import pathlib
+import sys
+
+root = pathlib.Path(sys.argv[1])
+errors = []
+
+
+def load(path: pathlib.Path) -> dict:
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        errors.append(f"missing file: {path.relative_to(root)}")
+        return {}
+    except json.JSONDecodeError as exc:
+        errors.append(f"invalid JSON: {path.relative_to(root)}: {exc}")
+        return {}
+    if not isinstance(data, dict):
+        errors.append(f"{path.relative_to(root)} must be a JSON object")
+        return {}
+    return data
+
+
+def require_string(data: dict, path: pathlib.Path, field: str) -> None:
+    if not isinstance(data.get(field), str) or not data[field]:
+        errors.append(f"{path.relative_to(root)}: {field} must be a non-empty string")
+
+
+for rel in [
+    ".claude-plugin/plugin.json",
+    ".codex-plugin/plugin.json",
+    ".cursor-plugin/plugin.json",
+]:
+    path = root / rel
+    data = load(path)
+    for field in ["name", "version", "description", "repository", "license"]:
+        require_string(data, path, field)
+    author = data.get("author")
+    if not isinstance(author, dict) or not isinstance(author.get("name"), str) or not author["name"]:
+        errors.append(f"{rel}: author.name must be present")
+
+codex = load(root / ".codex-plugin" / "plugin.json")
+cursor = load(root / ".cursor-plugin" / "plugin.json")
+if codex.get("skills") != "./skills/":
+    errors.append(".codex-plugin/plugin.json: skills must be ./skills/")
+if cursor.get("skills") != "./skills/":
+    errors.append(".cursor-plugin/plugin.json: skills must be ./skills/")
+
+package_json = load(root / "package.json")
+if package_json.get("main") != ".opencode/plugins/agent-tools.js":
+    errors.append("package.json: main must be .opencode/plugins/agent-tools.js")
+if package_json.get("type") != "module":
+    errors.append("package.json: type must be module for the OpenCode plugin")
+if not (root / ".opencode" / "plugins" / "agent-tools.js").is_file():
+    errors.append("missing file: .opencode/plugins/agent-tools.js")
+
+if errors:
+    for error in errors:
+        print(f"error: {error}", file=sys.stderr)
+    raise SystemExit(1)
+PY
+}
+
 json_public() {
   python3 - "$1" <<'PY'
 import json
@@ -280,12 +345,61 @@ scan_tree() {
   rm -f /tmp/agent-tools-secret-scan.$$
 }
 
+verify_root_indexes() {
+  python3 - "$ROOT" <<'PY'
+import json
+import os
+import pathlib
+import sys
+
+root = pathlib.Path(sys.argv[1])
+errors = []
+
+for tool_path in sorted((root / "packages").glob("*/tool.json")):
+    package_dir = tool_path.parent
+    tool = json.loads(tool_path.read_text(encoding="utf-8"))
+    if tool.get("public") is not True:
+        continue
+    name = tool.get("name") or package_dir.name
+
+    skill_link = root / "skills" / name
+    expected_skill = f"../packages/{name}/skills/{name}"
+    if not skill_link.is_symlink():
+        errors.append(f"skills/{name} must be a symlink to {expected_skill}")
+    elif os.readlink(skill_link) != expected_skill:
+        errors.append(f"skills/{name} points to {os.readlink(skill_link)}, expected {expected_skill}")
+    if not (skill_link / "SKILL.md").exists():
+        errors.append(f"skills/{name} target is missing SKILL.md")
+
+    commands_dir = package_dir / "commands"
+    if commands_dir.is_dir():
+        for command_file in sorted(commands_dir.glob("*.md")):
+            command_name = command_file.name
+            command_link = root / "commands" / command_name
+            expected_command = f"../packages/{name}/commands/{command_name}"
+            if not command_link.is_symlink():
+                errors.append(f"commands/{command_name} must be a symlink to {expected_command}")
+            elif os.readlink(command_link) != expected_command:
+                errors.append(
+                    f"commands/{command_name} points to {os.readlink(command_link)}, "
+                    f"expected {expected_command}"
+                )
+
+if errors:
+    for error in errors:
+        print(f"error: {error}", file=sys.stderr)
+    raise SystemExit(1)
+PY
+}
+
 check_file "$ROOT/.claude-plugin/marketplace.json"
 check_file "$ROOT/skillshare-hub.json"
 valid_json "$ROOT/.claude-plugin/marketplace.json"
 valid_json "$ROOT/skillshare-hub.json"
+validate_root_wrappers
 validate_marketplace
 validate_skillshare_hub
+verify_root_indexes
 
 shopt -s nullglob
 found=0

@@ -14,7 +14,8 @@ packages/codex-reset-credit/skills/codex-reset-credit
 
 - Claude Code: `/plugin install codex-reset-credit@agent-tools`
 - Codex: copy `packages/codex-reset-credit/skills/codex-reset-credit`
-- OpenCode: copy `packages/codex-reset-credit/skills/codex-reset-credit`
+- Cursor: root `skills/codex-reset-credit` symlink through `.cursor-plugin/plugin.json`
+- OpenCode: root plugin wrapper or copy `packages/codex-reset-credit/skills/codex-reset-credit`
 - Claude Desktop: build `.dist/claude/custom-skills/codex-reset-credit`
 - Skillshare: install
   `heyNag/agent-tools/packages/codex-reset-credit/skills/codex-reset-credit`

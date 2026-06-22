@@ -12,8 +12,8 @@ packages/<name>/skills/<name>
 ```
 
 Keep `watch-video`, `codex-reset-credit`, and `x-bookmarks` easy to install in
-Claude Code, Codex, Claude Desktop custom skills, OpenCode, and optional
-Skillshare.
+Claude Code, Codex, Cursor, Claude Desktop custom skills, OpenCode, and
+optional Skillshare.
 
 ## Phase 2: Better Reports And Fallbacks
 

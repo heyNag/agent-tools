@@ -10,11 +10,28 @@ helper scripts, Claude Code plugins, and optional Skillshare discovery.
 ## Source-Only Packages
 
 Use `packages/<name>` as the package source and Claude Code plugin root. The
-portable skill lives at `packages/<name>/skills/<name>`. Codex, OpenCode,
-generic Agent Skills, and Skillshare use that skill folder directly.
+portable skill lives at `packages/<name>/skills/<name>`. Codex, Cursor,
+OpenCode, generic Agent Skills, and Skillshare use that skill folder directly
+or through root symlink indexes.
 
 This avoids committed per-target copies and keeps one editable source path for
 each skill.
+
+## Root Harness Wrappers
+
+Keep lightweight root wrappers for harnesses that expect repository-level
+metadata:
+
+```text
+.claude-plugin/plugin.json
+.codex-plugin/plugin.json
+.cursor-plugin/plugin.json
+.opencode/plugins/agent-tools.js
+```
+
+These wrappers point at `skills/`, a symlink index generated from
+`packages/<name>/skills/<name>`. The symlink index is not an editable source
+tree.
 
 ## No Current MCP Tree
 

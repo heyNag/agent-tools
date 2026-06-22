@@ -21,7 +21,13 @@ one shared skills tree to multiple agent targets.
 packages/<name>/                 package source and Claude Code plugin root
 packages/<name>/skills/<name>/   portable skill folder for Codex/OpenCode/etc.
 packages/<name>/commands/        optional Claude Code slash commands
+skills/<name>                    root symlink index for Codex/Cursor/OpenCode
+commands/*.md                    root symlink index for umbrella Claude commands
 .claude-plugin/marketplace.json  Claude Code marketplace catalog
+.claude-plugin/plugin.json       optional root/umbrella Claude plugin metadata
+.codex-plugin/plugin.json        Codex plugin metadata
+.cursor-plugin/plugin.json       Cursor plugin metadata
+.opencode/plugins/agent-tools.js OpenCode plugin wrapper
 skillshare-hub.json              optional Skillshare hub index
 .dist/                           ignored local build artifacts
 docs/                            project memory and onboarding docs
@@ -29,7 +35,8 @@ scripts/                         build, install, test, and release helpers
 ```
 
 There is no committed `generated/` target-copy folder. Claude Code installs
-`packages/<name>` directly. Codex and OpenCode copy
+`packages/<name>` directly for per-skill plugins. Codex, Cursor, and OpenCode
+can use the root `skills/` symlink index or copy
 `packages/<name>/skills/<name>` directly. Claude Desktop custom-skill bundles
 are built locally under `.dist/` when needed.
 
@@ -75,7 +82,33 @@ Local development shortcut:
 ./scripts/install-codex.sh
 ```
 
+## Install For Cursor
+
+Cursor support is exposed through `.cursor-plugin/plugin.json`, which points at
+the root `skills/` symlink index.
+
+If your Cursor version does not support git plugin installs yet, use the direct
+skill folder copy pattern for the skill target Cursor supports:
+
+```sh
+git clone https://github.com/heyNag/agent-tools.git
+cd agent-tools
+make build-root-indexes
+```
+
 ## Install For OpenCode
+
+Plugin install:
+
+```json
+{
+  "plugin": ["agent-tools@git+https://github.com/heyNag/agent-tools.git"]
+}
+```
+
+Restart OpenCode after editing `opencode.json`.
+
+Direct copy fallback:
 
 ```sh
 git clone https://github.com/heyNag/agent-tools.git
@@ -184,10 +217,10 @@ make public-check
 git status
 ```
 
-`make build-packages` refreshes `.claude-plugin/marketplace.json`,
-`skillshare-hub.json`, and ignored Claude custom-skill artifacts under
-`.dist/`. `make public-check` runs tests, syntax checks, package verification,
-metadata verification, source-index drift checks, and install dry-runs.
+`make build-packages` refreshes root symlink indexes, `.claude-plugin/marketplace.json`,
+`skillshare-hub.json`, and ignored Claude custom-skill artifacts under `.dist/`.
+`make public-check` runs tests, syntax checks, package verification, metadata
+verification, source-index drift checks, and install dry-runs.
 
 ## Docs
 

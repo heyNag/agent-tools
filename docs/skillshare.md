@@ -67,7 +67,8 @@ This repo no longer commits per-target `generated/` copies. GitHub search
 should primarily find the source skill files under `packages/*/skills/*`.
 
 If a local or external search tool shows stale generated paths, refresh the repo
-checkout and make sure `.skillignore` hides `.dist/` and `generated/`.
+checkout and make sure `.skillignore` hides `.dist/`, `generated/`, `skills/`,
+and `commands/`.
 
 ## Update Flow
 

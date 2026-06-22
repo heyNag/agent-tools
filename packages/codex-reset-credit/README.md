@@ -20,9 +20,10 @@ The package root is a Claude Code plugin source. The portable skill source is:
 packages/codex-reset-credit/skills/codex-reset-credit
 ```
 
-Codex, OpenCode, generic Agent Skills, and optional Skillshare installs all use
-that same skill folder. Claude Desktop custom-skill ZIP contents are built
-locally under `.dist/claude/custom-skills/codex-reset-credit`.
+Codex, Cursor, OpenCode, generic Agent Skills, and optional Skillshare installs
+all use that same skill folder directly or through the root `skills/` symlink
+index. Claude Desktop custom-skill ZIP contents are built locally under
+`.dist/claude/custom-skills/codex-reset-credit`.
 
 ## Usage
 

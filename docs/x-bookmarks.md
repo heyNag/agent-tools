@@ -14,7 +14,8 @@ packages/x-bookmarks/skills/x-bookmarks
 
 - Claude Code: `/plugin install x-bookmarks@agent-tools`
 - Codex: copy `packages/x-bookmarks/skills/x-bookmarks`
-- OpenCode: copy `packages/x-bookmarks/skills/x-bookmarks`
+- Cursor: root `skills/x-bookmarks` symlink through `.cursor-plugin/plugin.json`
+- OpenCode: root plugin wrapper or copy `packages/x-bookmarks/skills/x-bookmarks`
 - Claude Desktop: build `.dist/claude/custom-skills/x-bookmarks`
 - Skillshare: install `heyNag/agent-tools/packages/x-bookmarks/skills/x-bookmarks`
 

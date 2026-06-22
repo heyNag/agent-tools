@@ -30,7 +30,8 @@ With the standard targets, this one source package supports:
 
 - Claude Code: package root `packages/awesome-skill`
 - Codex: skill folder `packages/awesome-skill/skills/awesome-skill`
-- OpenCode/generic Agent Skills: same skill folder
+- Cursor: root symlink `skills/awesome-skill`
+- OpenCode/generic Agent Skills: same skill folder or root symlink
 - Claude Desktop / claude.ai: local `.dist/claude/custom-skills/awesome-skill`
   artifact built by `make build-packages`
 - Skillshare: hub entry pointing to
@@ -62,8 +63,8 @@ Create `packages/awesome-skill/tool.json`:
   "name": "awesome-skill",
   "description": "Describe the skill in one public-facing sentence.",
   "tags": ["awesome", "local"],
-  "targets": ["claude", "codex", "generic"],
-  "surfaces": ["claude-code", "claude-desktop", "codex", "opencode"],
+  "targets": ["claude", "codex", "cursor", "generic"],
+  "surfaces": ["claude-code", "claude-desktop", "codex", "cursor", "opencode"],
   "agent_agnostic": true,
   "has_mcp": false,
   "public": true
@@ -144,7 +145,8 @@ git status
 ```
 
 `make build-packages` refreshes `.claude-plugin/marketplace.json`,
-`skillshare-hub.json`, and ignored `.dist/` Claude custom-skill artifacts.
+`skillshare-hub.json`, root `skills/` and `commands/` symlink indexes, and
+ignored `.dist/` Claude custom-skill artifacts.
 
 ## Step 8: Commit
 
@@ -159,5 +161,6 @@ caches.
 - `packages/awesome-skill/skills/awesome-skill/SKILL.md` exists.
 - No root `packages/awesome-skill/SKILL.md` exists.
 - Tags match between `tool.json` and `SKILL.md`.
+- `skills/awesome-skill` is a symlink created by `make build-packages`.
 - Docs mention source paths and install paths.
 - `make public-check` passes.

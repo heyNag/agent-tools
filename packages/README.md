@@ -5,8 +5,11 @@
 Each package is directly consumable:
 
 - Claude Code installs the package directory as a plugin source.
-- Codex copies the package's `skills/<name>` folder.
-- OpenCode/generic Agent Skills copy the same `skills/<name>` folder.
+- Codex can copy the package's `skills/<name>` folder or use the root
+  `.codex-plugin` wrapper.
+- Cursor uses the root `.cursor-plugin` wrapper and `skills/` symlink index.
+- OpenCode/generic Agent Skills can use the root OpenCode plugin wrapper or
+  copy the same `skills/<name>` folder.
 - Claude Desktop custom-skill ZIP folders are built locally under `.dist/`.
 
 Current packages:

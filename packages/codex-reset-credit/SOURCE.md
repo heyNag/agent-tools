@@ -26,6 +26,7 @@ Install targets consume source directly:
 ```text
 Claude Code marketplace source  -> packages/codex-reset-credit
 Codex skill source              -> packages/codex-reset-credit/skills/codex-reset-credit
+Cursor plugin source            -> skills/codex-reset-credit symlink
 OpenCode/generic skill source   -> packages/codex-reset-credit/skills/codex-reset-credit
 Skillshare hub source           -> packages/codex-reset-credit/skills/codex-reset-credit
 Claude Desktop local artifact   -> .dist/claude/custom-skills/codex-reset-credit

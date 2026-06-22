@@ -37,7 +37,9 @@ Do not create committed target-copy folders. This repo is source-only for public
 targets:
 
 - Claude Code marketplace entries point directly at `packages/<name>`.
-- Codex and OpenCode copy `packages/<name>/skills/<name>`.
+- Codex and OpenCode can copy `packages/<name>/skills/<name>`.
+- Cursor, root Codex plugin metadata, and the OpenCode plugin wrapper use the
+  root `skills/` symlink index.
 - Claude Desktop custom-skill folders are local `.dist/` artifacts.
 - Skillshare hub entries point at `packages/<name>/skills/<name>`.
 

@@ -32,6 +32,8 @@ git push
 ```text
 .claude-plugin/marketplace.json
 skillshare-hub.json
+skills/<name>                    symlink index
+commands/*.md                    symlink index when package commands exist
 .dist/claude/custom-skills/<name>  ignored local artifact
 ```
 
@@ -68,6 +70,7 @@ creates a GitHub Release tagged:
 |---|---|
 | Claude Code | Reinstall/update the plugin from the marketplace if Claude Code offers an update flow. If unsure, run `/plugin list`, `/plugin details <name>@agent-tools`, then reinstall with `/plugin install <name>@agent-tools`. |
 | Codex | Pull the repo and copy `packages/<name>/skills/<name>` into `~/.codex/skills/<name>`. |
+| Cursor | Update the repo/plugin checkout. The Cursor manifest points at the root `skills/` symlink index. |
 | OpenCode | Pull the repo and copy `packages/<name>/skills/<name>` into `~/.config/opencode/skills/<name>` or the configured skill path. |
 | Claude Desktop / claude.ai | Pull the repo, run `make build-packages`, zip `.dist/claude/custom-skills/<name>`, and import/replace the skill. |
 | Skillshare | If installed with `--track`, run `skillshare check`, `skillshare update <name>`, then `skillshare sync`. Otherwise reinstall from the hub or direct skill path. |

@@ -26,6 +26,7 @@ for tool_json in "$ROOT"/packages/*/tool.json; do
   "$ROOT/scripts/build-claude-custom-skill.sh" "$package"
 done
 
+"$ROOT/scripts/build-root-indexes.sh"
 "$ROOT/scripts/build-marketplace.sh"
 python3 "$ROOT/scripts/build-skillshare-hub.py" "$ROOT"
 

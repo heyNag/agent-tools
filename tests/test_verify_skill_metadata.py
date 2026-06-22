@@ -28,7 +28,7 @@ class VerifySkillMetadataTests(unittest.TestCase):
             "name": name,
             "description": f"{name} description",
             "tags": tool_tags if tool_tags is not None else ["local", "safe"],
-            "targets": ["claude", "codex", "generic"],
+            "targets": ["claude", "codex", "cursor", "generic"],
             "agent_agnostic": True,
             "public": True,
         }
@@ -91,7 +91,14 @@ class VerifySkillMetadataTests(unittest.TestCase):
 
             errors = module.validate_skillignore(root)
 
-        self.assertEqual(errors, [".skillignore: must include .dist/"])
+        self.assertEqual(
+            errors,
+            [
+                ".skillignore: must include .dist/",
+                ".skillignore: must include skills/",
+                ".skillignore: must include commands/",
+            ],
+        )
 
 
 if __name__ == "__main__":

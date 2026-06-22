@@ -18,6 +18,8 @@ Useful ideas adopted here:
 
 - source-first package layout
 - target manifests pointing at source folders
+- root harness wrappers for Codex, Cursor, Claude, and OpenCode
+- symlink indexes instead of copied skill trees
 - no committed per-target generated tree
 - ignored local artifacts for target-specific packaging
 - explicit target docs and runtime boundaries
@@ -36,26 +38,23 @@ packages/<name>/commands
 ```
 
 Claude Code marketplace entries point directly at `./packages/<name>`. Codex,
-OpenCode, generic Agent Skills, and Skillshare use
-`packages/<name>/skills/<name>`. Claude Desktop custom-skill artifacts are built
-under ignored `.dist/`.
+Cursor, OpenCode, generic Agent Skills, and Skillshare use
+`packages/<name>/skills/<name>` directly or through the root `skills/` symlink
+index. Claude Desktop custom-skill artifacts are built under ignored `.dist/`.
 
 ## Differences Kept Deliberately
 
 - Superpowers is a broad methodology with bootstrap/session-start behavior.
   `agent-tools` currently contains task/domain skills and does not inject global
   bootstrap context.
-- Superpowers supports many more harnesses. `agent-tools` currently documents
-  Claude Code, Claude Desktop, Codex, OpenCode, and optional Skillshare.
+- Superpowers supports more harnesses. `agent-tools` currently documents Claude
+  Code, Claude Desktop, Codex, Cursor, OpenCode, and optional Skillshare.
 - Superpowers has official marketplace integrations. `agent-tools` uses a
   public GitHub repo, Claude Code marketplace catalog, direct skill folders, and
   optional Skillshare hub metadata.
 
 ## Deferred Ideas
 
-- target-specific plugin adapters beyond Claude Code
-- OpenCode plugin that registers the package skill paths automatically
-- official Codex plugin metadata
 - richer skill behavior tests across harnesses
 - bootstrap-style process skills, only if the repo later adds broad workflow
   skills that require automatic activation

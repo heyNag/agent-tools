@@ -10,6 +10,7 @@ Targets:
 Claude Code
 Claude Desktop / claude.ai custom skills
 Codex
+Cursor
 OpenCode / generic Agent Skills
 ```
 
@@ -36,13 +37,13 @@ is target-specific.
 
 ## Target Differences
 
-| Action | Claude Code | Claude Desktop / claude.ai | Codex | OpenCode / generic |
-|---|---|---|---|---|
-| Install | `/plugin install <name>@agent-tools` | Upload ZIP built from `.dist/claude/custom-skills/<name>` | Copy `packages/<name>/skills/<name>` | Copy `packages/<name>/skills/<name>` |
-| Skill file | `skills/<name>/SKILL.md` inside package plugin | lowercase `skill.md` in ZIP artifact | top-level `SKILL.md` in copied folder | top-level `SKILL.md` in copied folder |
-| Commands | `packages/<name>/commands/` | No slash command wrapper | No slash command wrapper | No slash command wrapper |
-| Local scripts | Best local target with shell access | Only if host exposes local tools | Best local target with shell access | Best local target with shell access |
-| Updates | Plugin update/reinstall flow | Rebuild/download and import new ZIP | Pull repo and copy skill folder | Pull repo and copy skill folder |
+| Action | Claude Code | Claude Desktop / claude.ai | Codex | Cursor | OpenCode / generic |
+|---|---|---|---|---|---|
+| Install | `/plugin install <name>@agent-tools` | Upload ZIP built from `.dist/claude/custom-skills/<name>` | Copy `packages/<name>/skills/<name>` or use `.codex-plugin/plugin.json` | Use `.cursor-plugin/plugin.json` | Use `.opencode/plugins/agent-tools.js` or copy `packages/<name>/skills/<name>` |
+| Skill file | `skills/<name>/SKILL.md` inside package plugin | lowercase `skill.md` in ZIP artifact | top-level `SKILL.md` in copied folder or root `skills/<name>/SKILL.md` symlink | root `skills/<name>/SKILL.md` symlink | root `skills/<name>/SKILL.md` symlink or copied folder |
+| Commands | `packages/<name>/commands/` or root `commands/` symlink index | No slash command wrapper | No slash command wrapper | No slash command wrapper | No slash command wrapper |
+| Local scripts | Best local target with shell access | Only if host exposes local tools | Best local target with shell access | Depends on Cursor runtime permissions | Best local target with shell access |
+| Updates | Plugin update/reinstall flow | Rebuild/download and import new ZIP | Pull repo and copy skill folder or update plugin checkout | Update plugin checkout | Update plugin checkout or copy skill folder |
 
 ## Runtime Boundary
 

@@ -16,6 +16,13 @@ packages/<name>/
     agents/                 optional
 ```
 
+Root plugin wrappers use symlink indexes:
+
+```text
+skills/<name> -> ../packages/<name>/skills/<name>
+commands/*.md -> ../packages/<name>/commands/*.md
+```
+
 ## Surface Map
 
 Claude Code:
@@ -35,7 +42,21 @@ cp -R packages/codex-reset-credit/skills/codex-reset-credit ~/.codex/skills/code
 cp -R packages/x-bookmarks/skills/x-bookmarks ~/.codex/skills/x-bookmarks
 ```
 
+Cursor:
+
+```text
+.cursor-plugin/plugin.json -> ./skills/
+```
+
 OpenCode:
+
+```json
+{
+  "plugin": ["agent-tools@git+https://github.com/heyNag/agent-tools.git"]
+}
+```
+
+Direct copy fallback:
 
 ```sh
 cp -R packages/watch-video/skills/watch-video ~/.config/opencode/skills/watch-video

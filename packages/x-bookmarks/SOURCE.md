@@ -28,6 +28,7 @@ Install targets consume source directly:
 ```text
 Claude Code marketplace source  -> packages/x-bookmarks
 Codex skill source              -> packages/x-bookmarks/skills/x-bookmarks
+Cursor plugin source            -> skills/x-bookmarks symlink
 OpenCode/generic skill source   -> packages/x-bookmarks/skills/x-bookmarks
 Skillshare hub source           -> packages/x-bookmarks/skills/x-bookmarks
 Claude Desktop local artifact   -> .dist/claude/custom-skills/x-bookmarks

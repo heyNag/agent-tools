@@ -7,7 +7,12 @@ plugins, optional Skillshare discovery, and helper scripts.
 
 ```text
 packages/             source packages and Claude Code plugin roots
+skills/               symlink index to package skill sources
+commands/             symlink index to package Claude command sources
 .claude-plugin/       Claude Code marketplace catalog
+.codex-plugin/        Codex plugin metadata
+.cursor-plugin/       Cursor plugin metadata
+.opencode/            OpenCode plugin wrapper
 skillshare-hub.json   optional Skillshare hub index
 .dist/                ignored local build artifacts
 scripts/              install, build, test, and release helpers
@@ -48,6 +53,7 @@ Public install surfaces consume source paths:
 ```text
 Claude Code       -> packages/<name>
 Codex             -> packages/<name>/skills/<name>
+Cursor            -> skills/<name> symlink index
 OpenCode/generic  -> packages/<name>/skills/<name>
 Skillshare hub    -> packages/<name>/skills/<name>
 Claude Desktop    -> .dist/claude/custom-skills/<name> built locally
@@ -57,6 +63,18 @@ The root `.claude-plugin/marketplace.json` is generated from package manifests
 and points to `./packages/<name>`. `skillshare-hub.json` is generated from
 `tool.json`, `.claude-plugin/plugin.json`, and skill frontmatter, and points to
 `packages/<name>/skills/<name>`.
+
+Root plugin wrappers use the symlink indexes:
+
+```text
+.claude-plugin/plugin.json       optional umbrella Claude plugin metadata
+.codex-plugin/plugin.json        skills: ./skills/
+.cursor-plugin/plugin.json       skills: ./skills/
+.opencode/plugins/agent-tools.js registers ./skills/
+```
+
+The symlink indexes are maintained by `make build-root-indexes`, which is also
+run by `make build-packages`.
 
 Run:
 
@@ -83,6 +101,8 @@ Edit source paths:
 
 ```text
 packages/<name>/
+skills/
+commands/
 scripts/
 docs/
 ```

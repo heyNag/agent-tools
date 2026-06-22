@@ -1,0 +1,20 @@
+{
+  "name": "agent-tools",
+  "displayName": "Agent Tools",
+  "description": "Agent skills for video inspection, Codex quota checks, and X/Twitter bookmark review.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Nagarjuna Boddu"
+  },
+  "homepage": "https://github.com/heyNag/agent-tools",
+  "repository": "https://github.com/heyNag/agent-tools",
+  "license": "MIT",
+  "keywords": [
+    "skills",
+    "agents",
+    "video",
+    "codex",
+    "bookmarks"
+  ],
+  "skills": "./skills/"
+}

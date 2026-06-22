@@ -29,7 +29,7 @@ class BuildSkillshareHubTests(unittest.TestCase):
         tool = {
             "name": name,
             "description": f"{name} description",
-            "targets": targets if targets is not None else ["claude", "codex", "generic"],
+            "targets": targets if targets is not None else ["claude", "codex", "cursor", "generic"],
             "agent_agnostic": True,
             "public": public,
         }

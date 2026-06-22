@@ -1,4 +1,4 @@
-.PHONY: test syntax doctor install install-dry-run groq-test clean-artifacts build-marketplace build-skillshare-hub build-claude-custom-skill build-packages verify-skill-metadata verify-packages verify-source-clean public-check ci-local
+.PHONY: test syntax doctor install install-dry-run groq-test clean-artifacts build-root-indexes build-marketplace build-skillshare-hub build-claude-custom-skill build-packages verify-skill-metadata verify-packages verify-source-clean public-check ci-local
 
 AUDIO ?=
 PYTHON ?= python3
@@ -19,6 +19,9 @@ syntax:
 	@files="$$(find packages scripts -path '*/__pycache__' -prune -o -name '*.py' -print)"; \
 	PYTHONDONTWRITEBYTECODE=1 python3 scripts/check-python-syntax.py $$files
 	bash -n scripts/*.sh packages/*/skills/*/scripts/*.sh
+	@if command -v node >/dev/null 2>&1 && [ -f .opencode/plugins/agent-tools.js ]; then \
+		node --check .opencode/plugins/agent-tools.js; \
+	fi
 
 doctor:
 	$(PYTHON) packages/watch-video/skills/watch-video/scripts/doctor.py
@@ -45,6 +48,9 @@ build-marketplace:
 build-skillshare-hub:
 	$(PYTHON) scripts/build-skillshare-hub.py
 
+build-root-indexes:
+	./scripts/build-root-indexes.sh
+
 build-claude-custom-skill:
 	./scripts/build-claude-custom-skill.sh
 
@@ -63,9 +69,12 @@ verify-source-clean:
 	trap 'rm -rf "$$tmp_dir"' EXIT; \
 	cp .claude-plugin/marketplace.json "$$tmp_dir/marketplace.json.before"; \
 	cp skillshare-hub.json "$$tmp_dir/skillshare-hub.json.before"; \
-	$(MAKE) build-marketplace build-skillshare-hub >/dev/null; \
+	find skills commands -mindepth 1 -maxdepth 1 -type l -print -exec readlink {} \; | sort > "$$tmp_dir/root-indexes.before"; \
+	$(MAKE) build-root-indexes build-marketplace build-skillshare-hub >/dev/null; \
 	diff -u "$$tmp_dir/marketplace.json.before" .claude-plugin/marketplace.json; \
 	diff -u "$$tmp_dir/skillshare-hub.json.before" skillshare-hub.json; \
+	find skills commands -mindepth 1 -maxdepth 1 -type l -print -exec readlink {} \; | sort > "$$tmp_dir/root-indexes.after"; \
+	diff -u "$$tmp_dir/root-indexes.before" "$$tmp_dir/root-indexes.after"; \
 	echo "source package indexes are current"
 
 public-check:

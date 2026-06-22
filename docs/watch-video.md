@@ -35,7 +35,8 @@ frames/
 
 - Claude Code: `/plugin install watch-video@agent-tools`
 - Codex: copy `packages/watch-video/skills/watch-video`
-- OpenCode: copy `packages/watch-video/skills/watch-video`
+- Cursor: root `skills/watch-video` symlink through `.cursor-plugin/plugin.json`
+- OpenCode: root plugin wrapper or copy `packages/watch-video/skills/watch-video`
 - Claude Desktop: build `.dist/claude/custom-skills/watch-video`
 - Skillshare: install `heyNag/agent-tools/packages/watch-video/skills/watch-video`
 

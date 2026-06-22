@@ -47,11 +47,22 @@ a standard `skills/<name>/SKILL.md` folder inside the package.
 
 There is no committed `generated/` folder.
 
+The repo root also has source-only symlink indexes for harnesses that expect a
+single `./skills/` folder:
+
+```text
+skills/<name> -> ../packages/<name>/skills/<name>
+commands/*.md -> ../packages/<name>/commands/*.md
+```
+
+Do not edit through those symlink indexes. Edit the package source.
+
 Target mapping:
 
 ```text
 Claude Code marketplace source  -> packages/<name>
 Codex skill source              -> packages/<name>/skills/<name>
+Codex/Cursor root plugin source -> skills/<name> symlink index
 OpenCode/generic skill source   -> packages/<name>/skills/<name>
 Skillshare hub source           -> packages/<name>/skills/<name>
 Claude Desktop local artifact   -> .dist/claude/custom-skills/<name>

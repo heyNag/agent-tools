@@ -1,0 +1,1 @@
+../packages/watch-video/commands/watch.md

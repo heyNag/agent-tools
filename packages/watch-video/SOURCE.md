@@ -26,6 +26,7 @@ Install targets consume source directly:
 ```text
 Claude Code marketplace source  -> packages/watch-video
 Codex skill source              -> packages/watch-video/skills/watch-video
+Cursor plugin source            -> skills/watch-video symlink
 OpenCode/generic skill source   -> packages/watch-video/skills/watch-video
 Skillshare hub source           -> packages/watch-video/skills/watch-video
 Claude Desktop local artifact   -> .dist/claude/custom-skills/watch-video

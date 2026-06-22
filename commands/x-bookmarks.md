@@ -1,0 +1,1 @@
+../packages/x-bookmarks/commands/x-bookmarks.md
