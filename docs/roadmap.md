@@ -17,8 +17,12 @@ Desktop custom skills, OpenCode, and optional Skillshare.
 
 ## Phase 2: Better Reports And Fallbacks
 
-Improve `watch-video` report readability, caption cleanup, transcript previews,
-and fallback behavior when native captions are incomplete or unavailable.
+Mostly delivered: `watch-video` now probes captions before downloading,
+collapses rolling-caption duplication, picks frames by scene change or
+keyframe with near-duplicate removal and a detail dial, chunks Whisper audio
+past the upload cap, pins transcript-cue frames, and stores Whisper keys once.
+Remaining: richer visual report summaries and deeper caption-fallback
+diagnostics.
 
 ## Phase 3: Richer Agent Ergonomics
 

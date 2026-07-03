@@ -68,6 +68,14 @@ def validate_package(root: Path, tool_path: Path) -> list[str]:
             "'Use when ' and describe trigger conditions"
         )
 
+    for field in ("author", "license"):
+        if not frontmatter.get(field):
+            errors.append(f"{skill_path.relative_to(root)}: frontmatter {field} is required")
+    if frontmatter.get("user-invocable") not in {"true", "false"}:
+        errors.append(
+            f"{skill_path.relative_to(root)}: frontmatter user-invocable must be 'true' or 'false'"
+        )
+
     skill_tags = normalized_tags(frontmatter.get("tags"))
     if not skill_tags:
         errors.append(f"{skill_path.relative_to(root)}: frontmatter tags are required")

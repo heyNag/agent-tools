@@ -39,6 +39,9 @@ class VerifySkillMetadataTests(unittest.TestCase):
                 f"name: {name}\n"
                 f"description: Use when the user needs {name} help.\n"
                 f"tags: {skill_tags}\n"
+                "author: Test Author\n"
+                "license: MIT\n"
+                "user-invocable: true\n"
                 "---\n"
             ),
             encoding="utf-8",
@@ -82,6 +85,27 @@ class VerifySkillMetadataTests(unittest.TestCase):
             errors = module.validate_package(root, root / "packages" / "summary-skill" / "tool.json")
 
         self.assertTrue(any("description must start with 'Use when '" in error for error in errors))
+
+    def test_package_metadata_requires_author_license_and_invocable(self):
+        module = load_module()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp)
+            self.write_package(root, "bare-skill")
+            skill_path = root / "packages" / "bare-skill" / "skills" / "bare-skill" / "SKILL.md"
+            skill_path.write_text(
+                "---\n"
+                "name: bare-skill\n"
+                "description: Use when the user needs bare-skill help.\n"
+                "tags: local, safe\n"
+                "---\n",
+                encoding="utf-8",
+            )
+
+            errors = module.validate_package(root, root / "packages" / "bare-skill" / "tool.json")
+
+        self.assertTrue(any("frontmatter author is required" in error for error in errors))
+        self.assertTrue(any("frontmatter license is required" in error for error in errors))
+        self.assertTrue(any("user-invocable" in error for error in errors))
 
     def test_skillignore_requires_dist(self):
         module = load_module()

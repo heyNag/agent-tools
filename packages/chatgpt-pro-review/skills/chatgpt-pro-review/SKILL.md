@@ -6,6 +6,9 @@ tags: review, chatgpt, pro, planning, code-review
 allowed-tools: Read, Grep, Bash
 homepage: https://github.com/heyNag/charms
 repository: https://github.com/heyNag/charms
+author: Nagarjuna Boddu
+license: MIT
+user-invocable: true
 ---
 
 # ChatGPT Pro Review
