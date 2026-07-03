@@ -77,7 +77,8 @@ tagged:
 | Codex | Pull the repo and copy `packages/<name>/skills/<name>` into `~/.codex/skills/<name>`. |
 | Cursor | Update the repo/plugin checkout. The Cursor manifest points at the root `skills/` symlink index. |
 | OpenCode | Pull the repo and copy `packages/<name>/skills/<name>` into `~/.config/opencode/skills/<name>` or the configured skill path. |
-| Claude Desktop / claude.ai | Pull the repo, run `make build-packages`, zip `.dist/claude/custom-skills/<name>`, and import/replace the skill. |
+| Claude Desktop / claude.ai | Download the new release's attached ZIP and import/replace the skill, or pull the repo, run `make build-packages`, and zip `.dist/claude/custom-skills/<name>`. |
+| Agent Skills CLI installs | `npx skills update <name>` (or re-run `npx skills add heyNag/charms`). |
 | Skillshare | If installed with `--track`, run `skillshare check`, `skillshare update <name>`, then `skillshare sync`. Otherwise reinstall from the hub or direct skill path. |
 
 ## Codex Copy Example

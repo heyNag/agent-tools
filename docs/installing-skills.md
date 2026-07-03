@@ -21,10 +21,11 @@ For skill-specific requirements and examples, read:
 | Target | Best Path |
 |---|---|
 | Claude Code | Install from the Claude Code marketplace catalog. |
-| Codex | Copy `packages/<name>/skills/<name>` into `~/.codex/skills/<name>`. |
-| Cursor | Use `.cursor-plugin/plugin.json`, which points at the root `skills/` symlink index. |
+| Codex, Cursor, Copilot, Gemini CLI, and other Agent Skills hosts | `npx skills add heyNag/charms` (see below). |
+| Codex (manual) | Copy `packages/<name>/skills/<name>` into `~/.codex/skills/<name>`. |
+| Cursor (manual) | Use `.cursor-plugin/plugin.json`, which points at the root `skills/` symlink index. |
 | OpenCode | Use `.opencode/plugins/charms.js` or copy the skill folder. |
-| Claude Desktop / claude.ai | Build a local `.dist/claude/custom-skills/<name>` folder and upload a ZIP. |
+| Claude Desktop / claude.ai | Download the ZIP attached to the skill's GitHub release, or build it locally. |
 | Skillshare | Use the optional hub or direct package skill path. |
 
 ## Claude Code
@@ -55,6 +56,21 @@ Invoke:
 
 If command names differ in your Claude Code version, run `/plugin list` or
 `/plugin details <name>@charms`.
+
+## Agent Skills CLI (Codex, Cursor, Copilot, Gemini CLI, and more)
+
+The [Agent Skills](https://agentskills.io) installer discovers all public
+skills in this repo and installs them into whatever agents it detects:
+
+```sh
+npx skills add heyNag/charms            # pick skills interactively
+npx skills add heyNag/charms -g         # install globally for your user
+npx skills add heyNag/charms --list     # list without installing
+```
+
+Useful flags: `--skill <name>` to select one skill, `-a codex -a cursor` to
+target specific hosts, `--copy` to copy instead of symlinking. Update later
+with `npx skills update <name>`.
 
 ## Codex
 
@@ -119,8 +135,12 @@ cp -R "packages/$SKILL/skills/$SKILL" "$HOME/.config/opencode/skills/$SKILL"
 
 ## Claude Desktop Or Claude.ai Skills
 
-Claude custom skills use lowercase `skill.md`, so this repo builds local
-upload artifacts under ignored `.dist/`:
+Each skill release attaches a ready-to-upload ZIP
+(`<name>-claude-custom-skill-<version>.zip`) to its GitHub release - download
+it and upload in Claude's `Customize > Skills` flow.
+
+To build the same artifact locally instead (Claude custom skills use lowercase
+`skill.md`, so this repo builds upload artifacts under ignored `.dist/`):
 
 ```sh
 git clone https://github.com/heyNag/charms.git

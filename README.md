@@ -21,11 +21,13 @@ Pick your target and follow [docs/installing-skills.md](docs/installing-skills.m
 Quick orientation:
 
 - Claude Code installs packages from the marketplace catalog.
+- `npx skills add heyNag/charms` installs into Codex, Cursor, Copilot,
+  Gemini CLI, and other Agent Skills hosts.
 - Codex, OpenCode, generic Agent Skills, and Skillshare consume
   `packages/<name>/skills/<name>`.
 - Cursor and root plugin wrappers use the root `skills/` symlink index.
-- Claude Desktop / claude.ai custom skills are built locally under ignored
-  `.dist/` artifacts.
+- Claude Desktop / claude.ai custom skills ship as ZIPs on each skill's
+  GitHub release (or build locally under ignored `.dist/`).
 
 ## Use
 
