@@ -6,8 +6,14 @@ local video into a small evidence bundle:
 - metadata
 - focused audio clip
 - transcript JSON and Markdown
-- optional frames
+- scene-aware frames with near-duplicate removal
 - a concise report
+
+Captions are probed before any download, so transcript-only requests on
+captioned URLs never fetch media. Frame selection is content-aware: scene
+changes by default, keyframe-only for fast skims, uniform sampling as the
+static-footage fallback, with exact timestamps and a dedup pass that stops
+held slides from burning the frame budget.
 
 The package root is a Claude Code plugin source. The portable skill source is:
 
@@ -26,7 +32,7 @@ Install commands for each target live in
 ## Requirements
 
 ```sh
-brew install yt-dlp ffmpeg jq
+brew install yt-dlp ffmpeg jq   # or: python3 .../scripts/doctor.py --install
 python3 packages/watch-video/skills/watch-video/scripts/doctor.py
 ```
 
@@ -36,6 +42,13 @@ incomplete:
 ```sh
 export GROQ_API_KEY="..."
 export GROQ_MODEL="whisper-large-v3-turbo"
+```
+
+Or store the key once (written to `~/.config/watch-video/.env`, mode 600;
+environment variables take precedence):
+
+```sh
+python3 packages/watch-video/skills/watch-video/scripts/doctor.py --set-key groq
 ```
 
 OpenAI transcription is optional with `--transcriber openai` and
@@ -65,20 +78,33 @@ python3 scripts/watch.py "https://www.youtube.com/watch?v=DTCyvo6cC54" --duratio
 Focused examples:
 
 ```sh
+python3 scripts/watch.py "$URL" --detail transcript                # captions only, no download
+python3 scripts/watch.py "$URL" --detail efficient                 # fast keyframe skim
 python3 scripts/watch.py ./screen-recording.mov --start 00:15 --end 00:45 --mode ui-bug --frame-format png
 python3 scripts/watch.py "$URL" --mode tutorial --duration 60 --transcriber groq
-python3 scripts/watch.py "$URL" --transcriber none --frame-mode interval --frame-interval 10
+python3 scripts/watch.py "$URL" --timestamps 4:32,7:10             # pin transcript-cue frames
 ```
 
 Common options:
 
+- `--detail transcript|efficient|balanced|full` (default `balanced`, or
+  `WATCH_VIDEO_DETAIL`; agents ask the user per video unless the request
+  already implies a level)
 - `--transcriber groq|openai|none`
 - `--mode general|tutorial|ui-bug|notes`
-- `--frame-mode auto|interval`
-- `--fps` for an explicit FPS override, capped at 2
-- `--resolution` as an alias for `--frame-width`
+- `--timestamps T1,T2,...` to pin frames at exact moments
+- `--from-run DIR` to reuse a previous run's media for a second pass
+- `--sub-langs` yt-dlp caption selector (default English variants; pass
+  `"es,es.*"` for a Spanish video)
+- `--max-frames N` (hard caps: 100, or 300 in `full` detail)
+- `--resolution` as an alias for `--frame-width` (default 512; 1024 for UI text)
 - `--frame-format jpeg|png|webp`
+- `--no-dedup`, `--frame-mode interval`, `--fps` (uniform-sampling overrides)
 - `--cleanup` and `--cleanup-frames`
+
+Whisper fallback audio larger than the 24 MB upload cap is chunked, stitched
+back into source time, and tolerates partial chunk failures. Local videos pick
+up sidecar subtitle files automatically (`video.en.vtt` next to `video.mp4`).
 
 Outputs are written under `.watch-video/runs/<run-id>/` by default.
 

@@ -143,12 +143,14 @@ class WatchVideoBasicTests(unittest.TestCase):
 
             self.assertEqual(watch.pick_caption(tmp_path).name, "video.en.vtt")
 
-    def test_subtitle_language_selector_allows_fallback_tracks(self) -> None:
+    def test_subtitle_language_selector_is_english_preferred(self) -> None:
         watch = importlib.import_module("watch")
 
         self.assertIn("en", watch.SUBTITLE_LANGS)
-        self.assertIn("all", watch.SUBTITLE_LANGS)
         self.assertIn("-live_chat", watch.SUBTITLE_LANGS)
+        # Requesting every language fans out to 100+ auto-translate tracks and
+        # gets the whole download rate-limited (observed live: HTTP 429).
+        self.assertNotIn("all", watch.SUBTITLE_LANGS)
 
     def test_pick_caption_prefers_english_even_when_auto(self) -> None:
         watch = importlib.import_module("watch")
@@ -307,7 +309,7 @@ Next idea starts here
             self.assertIn(f"`{tmp_path / 'frames'}`", report)
             self.assertIn(str(tmp_path / "frames" / "frame.jpg"), report)
             self.assertIn("## Implementation Checklist", report)
-            self.assertIn("## Frame Plan", report)
+            self.assertIn("## Frame Selection", report)
 
     def test_report_modes_include_expected_sections(self) -> None:
         watch = importlib.import_module("watch")
@@ -418,6 +420,297 @@ Next idea starts here
             with mock.patch.dict(os.environ, env, clear=True):
                 with self.assertRaisesRegex(RuntimeError, "GROQ_API_KEY is not set"):
                     groq.transcribe_audio(audio)
+
+    def test_parse_vtt_trims_rolling_two_line_window(self) -> None:
+        """YouTube auto-subs repeat the previous line inside each new cue."""
+        watch = importlib.import_module("watch")
+
+        with tempfile.TemporaryDirectory() as tmp:
+            vtt = Path(tmp) / "captions.vtt"
+            vtt.write_text(
+                """WEBVTT
+
+00:00:02.000 --> 00:00:04.000
+Most people don't know that Claude can now watch any video for you. But if you
+
+00:00:04.000 --> 00:00:06.000
+now watch any video for you. But if you try doing this yourself without this
+
+00:00:06.000 --> 00:00:09.000
+try doing this yourself without this skill, it just gives up
+""",
+                encoding="utf-8",
+            )
+
+            segments = watch.parse_vtt(vtt)
+
+        # Overlap trim plus prefix-growth leaves zero duplicated words.
+        self.assertEqual(
+            [segment["text"] for segment in segments],
+            [
+                "Most people don't know that Claude can now watch any video for you. But if you",
+                "try doing this yourself without this skill, it just gives up",
+            ],
+        )
+
+    def test_trim_word_overlap_requires_meaningful_overlap(self) -> None:
+        watch = importlib.import_module("watch")
+
+        self.assertEqual(
+            watch._trim_word_overlap("we ship the parser today", "the parser today is fast"),
+            "is fast",
+        )
+        # A one-word coincidence must not be trimmed.
+        self.assertEqual(
+            watch._trim_word_overlap("read the code", "code review is next"),
+            "code review is next",
+        )
+
+    def test_parse_vtt_reads_srt_cues(self) -> None:
+        watch = importlib.import_module("watch")
+
+        with tempfile.TemporaryDirectory() as tmp:
+            srt = Path(tmp) / "captions.srt"
+            srt.write_text(
+                "1\n00:00:01,000 --> 00:00:02,500\nhello world\n\n"
+                "2\n00:00:03,000 --> 00:00:04,000\nnext line\n",
+                encoding="utf-8",
+            )
+
+            segments = watch.parse_vtt(srt)
+
+        self.assertEqual(
+            segments,
+            [
+                {"start": 1.0, "end": 2.5, "text": "hello world"},
+                {"start": 3.0, "end": 4.0, "text": "next line"},
+            ],
+        )
+
+    def test_find_sidecar_caption_prefers_english_vtt(self) -> None:
+        watch = importlib.import_module("watch")
+
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            video = tmp_path / "video.mp4"
+            video.write_bytes(b"stub")
+            (tmp_path / "video.srt").write_text("1\n", encoding="utf-8")
+            (tmp_path / "video.fr.vtt").write_text("WEBVTT\n", encoding="utf-8")
+            (tmp_path / "video.en.vtt").write_text("WEBVTT\n", encoding="utf-8")
+            (tmp_path / "other.en.vtt").write_text("WEBVTT\n", encoding="utf-8")
+
+            sidecar = watch.find_sidecar_caption(video)
+
+        self.assertIsNotNone(sidecar)
+        assert sidecar is not None
+        self.assertTrue(str(sidecar["path"]).endswith("video.en.vtt"))
+        self.assertEqual(sidecar["language"], "en")
+        self.assertEqual(sidecar["caption_type"], "sidecar")
+
+    def test_find_sidecar_caption_missing_is_none(self) -> None:
+        watch = importlib.import_module("watch")
+
+        with tempfile.TemporaryDirectory() as tmp:
+            video = Path(tmp) / "video.mp4"
+            video.write_bytes(b"stub")
+
+            self.assertIsNone(watch.find_sidecar_caption(video))
+
+    def test_resolve_detail_cap_defaults_and_overrides(self) -> None:
+        watch = importlib.import_module("watch")
+
+        self.assertEqual(watch.resolve_detail_cap("efficient", None), 50)
+        self.assertEqual(watch.resolve_detail_cap("balanced", None), 80)
+        self.assertEqual(watch.resolve_detail_cap("full", None), 300)
+        self.assertEqual(watch.resolve_detail_cap("balanced", 24), 24)
+        self.assertEqual(watch.resolve_detail_cap("balanced", 500), 100)
+        self.assertEqual(watch.resolve_detail_cap("full", 500), 300)
+
+    def test_default_detail_env_override(self) -> None:
+        watch = importlib.import_module("watch")
+
+        with mock.patch.dict(os.environ, {"WATCH_VIDEO_DETAIL": "efficient"}):
+            self.assertEqual(watch.default_detail(), "efficient")
+        with mock.patch.dict(os.environ, {"WATCH_VIDEO_DETAIL": "bogus"}):
+            self.assertEqual(watch.default_detail(), "balanced")
+
+    def test_parse_timestamps_sorted_unique(self) -> None:
+        extract_frames = importlib.import_module("extract_frames")
+
+        self.assertEqual(extract_frames.parse_timestamps("1:00, 30,1:00"), [30.0, 60.0])
+        self.assertEqual(extract_frames.parse_timestamps(None), [])
+        with self.assertRaises(ValueError):
+            extract_frames.parse_timestamps("nope")
+
+    def test_cues_in_window_filters_and_counts(self) -> None:
+        extract_frames = importlib.import_module("extract_frames")
+
+        kept, dropped = extract_frames.cues_in_window([5, 25, 95], 10, 60)
+        self.assertEqual(kept, [25.0])
+        self.assertEqual(dropped, 2)
+        kept, dropped = extract_frames.cues_in_window([5, 25], None, None)
+        self.assertEqual(kept, [5.0, 25.0])
+        self.assertEqual(dropped, 0)
+
+    def test_even_indices_keeps_first_and_last(self) -> None:
+        extract_frames = importlib.import_module("extract_frames")
+
+        indices = extract_frames._even_indices(10, 4)
+        self.assertEqual(indices[0], 0)
+        self.assertEqual(indices[-1], 9)
+        self.assertEqual(len(indices), 4)
+        self.assertEqual(extract_frames._even_indices(3, 8), [0, 1, 2])
+
+    def test_frame_delta_math(self) -> None:
+        extract_frames = importlib.import_module("extract_frames")
+
+        same = bytes([10] * 16)
+        self.assertEqual(extract_frames._frame_delta(same, same), 0.0)
+        self.assertEqual(
+            extract_frames._frame_delta(bytes([0, 0, 0, 0]), bytes([4, 0, 0, 0])), 1.0
+        )
+        self.assertEqual(
+            extract_frames._frame_delta(bytes([1, 2]), bytes([1, 2, 3])), float("inf")
+        )
+
+    def test_scale_filter_never_upscales_and_clamps_height(self) -> None:
+        extract_frames = importlib.import_module("extract_frames")
+
+        value = extract_frames.scale_filter(512)
+        self.assertIn("min(512,iw)", value)
+        self.assertIn(f"min({extract_frames.MAX_READ_HEIGHT},ih)", value)
+        self.assertIn("force_original_aspect_ratio=decrease", value)
+
+    def test_stored_key_roundtrip_precedence_and_perms(self) -> None:
+        groq = importlib.import_module("groq_transcribe")
+
+        with tempfile.TemporaryDirectory() as tmp:
+            with mock.patch.dict(os.environ, {"WATCH_VIDEO_CONFIG_DIR": tmp}, clear=False):
+                path = groq.set_stored_key("GROQ_API_KEY", "gsk_stored1")
+
+                self.assertEqual(path, Path(tmp) / ".env")
+                self.assertEqual(path.stat().st_mode & 0o777, 0o600)
+                self.assertEqual(groq.read_stored_key("GROQ_API_KEY"), "gsk_stored1")
+
+                # The environment variable must win over the stored key.
+                env = dict(os.environ)
+                env.pop("GROQ_API_KEY", None)
+                with mock.patch.dict(os.environ, env, clear=True):
+                    os.environ["WATCH_VIDEO_CONFIG_DIR"] = tmp
+                    self.assertEqual(groq._read_key("groq"), "gsk_stored1")
+                    os.environ["GROQ_API_KEY"] = "gsk_envwins"
+                    self.assertEqual(groq._read_key("groq"), "gsk_envwins")
+
+                # Re-storing replaces in place without duplicating lines.
+                groq.set_stored_key("GROQ_API_KEY", "gsk_newkey2")
+                content = path.read_text(encoding="utf-8")
+                self.assertEqual(content.count("GROQ_API_KEY="), 1)
+                self.assertNotIn("gsk_stored1", content)
+
+    def test_stored_key_parser_handles_quotes_and_inline_comments(self) -> None:
+        groq = importlib.import_module("groq_transcribe")
+
+        with tempfile.TemporaryDirectory() as tmp:
+            env_file = Path(tmp) / ".env"
+            env_file.write_text(
+                "# comment\n"
+                'OPENAI_API_KEY="sk-quoted1"\n'
+                "GROQ_API_KEY=gsk_plainv  # trailing note\n",
+                encoding="utf-8",
+            )
+            with mock.patch.dict(os.environ, {"WATCH_VIDEO_CONFIG_DIR": tmp}, clear=False):
+                self.assertEqual(groq.read_stored_key("OPENAI_API_KEY"), "sk-quoted1")
+                self.assertEqual(groq.read_stored_key("GROQ_API_KEY"), "gsk_plainv")
+
+    def test_set_stored_key_rejects_bad_input(self) -> None:
+        groq = importlib.import_module("groq_transcribe")
+
+        with tempfile.TemporaryDirectory() as tmp:
+            with mock.patch.dict(os.environ, {"WATCH_VIDEO_CONFIG_DIR": tmp}, clear=False):
+                with self.assertRaisesRegex(ValueError, "empty"):
+                    groq.set_stored_key("GROQ_API_KEY", "   ")
+                with self.assertRaisesRegex(ValueError, "single line"):
+                    groq.set_stored_key("GROQ_API_KEY", "gsk_a\ngsk_b")
+                with self.assertRaisesRegex(ValueError, "unsupported"):
+                    groq.set_stored_key("OTHER_KEY", "value")
+
+    def test_doctor_reports_stored_key_source(self) -> None:
+        doctor = importlib.import_module("doctor")
+        groq = importlib.import_module("groq_transcribe")
+
+        with tempfile.TemporaryDirectory() as tmp:
+            with mock.patch.dict(os.environ, {"WATCH_VIDEO_CONFIG_DIR": tmp}, clear=False):
+                groq.set_stored_key("GROQ_API_KEY", "gsk_" + "x" * 30)
+
+                check = doctor.check_whisper_key("groq", env={})
+
+                self.assertTrue(check["ok"])
+                self.assertEqual(check["source"], "config")
+
+                config_check = doctor.check_config_file()
+                self.assertTrue(config_check["ok"])
+                self.assertTrue(config_check["exists"])
+
+    def test_resolve_from_run_reuses_media_and_captions(self) -> None:
+        watch = importlib.import_module("watch")
+        import json as json_module
+
+        with tempfile.TemporaryDirectory() as tmp:
+            prior = Path(tmp) / "run"
+            media = prior / "media"
+            media.mkdir(parents=True)
+            (media / "video.mp4").write_bytes(b"stub")
+            (media / "video.en.vtt").write_text("WEBVTT\n", encoding="utf-8")
+
+            video, caption, info = watch.resolve_from_run(prior, "https://example.com/v")
+
+        self.assertTrue(str(video).endswith("video.mp4"))
+        self.assertIsNotNone(caption)
+        assert caption is not None
+        self.assertTrue(str(caption["path"]).endswith("video.en.vtt"))
+        self.assertEqual(info["reused_run"], str(prior.resolve()))
+
+        with tempfile.TemporaryDirectory() as tmp:
+            prior = Path(tmp) / "trimmed-run"
+            (prior / "media").mkdir(parents=True)
+            ((prior / "media") / "video.mp4").write_bytes(b"stub")
+            (prior / "metadata.json").write_text(
+                json_module.dumps({"range": {"focused_download_requested": True}}),
+                encoding="utf-8",
+            )
+
+            with self.assertRaisesRegex(SystemExit, "trimmed section"):
+                watch.resolve_from_run(prior, "https://example.com/v")
+
+        with tempfile.TemporaryDirectory() as tmp:
+            with self.assertRaisesRegex(SystemExit, "no reusable media"):
+                watch.resolve_from_run(Path(tmp) / "empty", "source")
+
+    def test_doctor_brew_package_mapping(self) -> None:
+        doctor = importlib.import_module("doctor")
+
+        self.assertEqual(doctor._brew_packages(["ffmpeg", "ffprobe", "yt-dlp"]), ["ffmpeg", "yt-dlp"])
+        self.assertEqual(doctor._brew_packages(["ffprobe"]), ["ffmpeg"])
+        self.assertEqual(doctor._brew_packages([]), [])
+
+    def test_plan_chunks_splits_past_upload_cap(self) -> None:
+        groq = importlib.import_module("groq_transcribe")
+        megabyte = 1024 * 1024
+
+        self.assertEqual(
+            groq.plan_chunks(600.0, 5 * megabyte, max_bytes=24 * megabyte),
+            [(0.0, 600.0)],
+        )
+        plan = groq.plan_chunks(3600.0, 71 * megabyte, max_bytes=24 * megabyte)
+        self.assertEqual(len(plan), 3)
+        self.assertEqual(plan[0][0], 0.0)
+        for (offset, duration), (next_offset, _) in zip(plan, plan[1:]):
+            self.assertAlmostEqual(offset + duration, next_offset)
+        last_offset, last_duration = plan[-1]
+        self.assertAlmostEqual(last_offset + last_duration, 3600.0)
+        bytes_per_second = 71 * megabyte / 3600.0
+        for _offset, duration in plan:
+            self.assertLessEqual(duration * bytes_per_second, 24 * megabyte + 1)
 
 
 if __name__ == "__main__":

@@ -6,10 +6,12 @@ from __future__ import annotations
 import argparse
 import io
 import json
+import math
 import mimetypes
 import os
 import shutil
 import subprocess
+import sys
 import time
 import uuid
 from email.utils import parsedate_to_datetime
@@ -24,6 +26,106 @@ DEFAULT_GROQ_MODEL = "whisper-large-v3-turbo"
 DEFAULT_OPENAI_MODEL = "whisper-1"
 DEFAULT_MAX_ATTEMPTS = 4
 DEFAULT_MAX_429_RETRIES = 2
+# Groq's free tier and OpenAI whisper-1 cap uploads at 25 MB. Target a margin
+# under that so multipart framing overhead never pushes a chunk over.
+MAX_UPLOAD_BYTES = 24 * 1024 * 1024
+KEY_NAMES = {"groq": "GROQ_API_KEY", "openai": "OPENAI_API_KEY"}
+
+_PERM_WARNED: set[str] = set()
+
+
+def config_env_path() -> Path:
+    """Stored-key file for installed-skill use; env vars always win over it."""
+    base = os.environ.get("WATCH_VIDEO_CONFIG_DIR", "~/.config/watch-video")
+    return Path(base).expanduser() / ".env"
+
+
+def _warn_loose_permissions(path: Path) -> None:
+    key = str(path)
+    if key in _PERM_WARNED:
+        return
+    try:
+        mode = path.stat().st_mode
+    except OSError:
+        return
+    if mode & 0o077:
+        _PERM_WARNED.add(key)
+        print(
+            f"[watch-video] warning: {path} is readable by other users. "
+            f"fix: chmod 600 {path}",
+            file=sys.stderr,
+        )
+
+
+def _parse_env_line(line: str) -> tuple[str, str] | None:
+    raw = line.strip()
+    if not raw or raw.startswith("#") or "=" not in raw:
+        return None
+    name, _, value = raw.partition("=")
+    value = value.strip()
+    if len(value) >= 2 and value[0] in {"'", '"'} and value[-1] == value[0]:
+        value = value[1:-1]
+    else:
+        # Strip an inline comment from an unquoted value so
+        # `GROQ_API_KEY=gsk_x  # note` does not poison the key.
+        for index, char in enumerate(value):
+            if char == "#" and index > 0 and value[index - 1] in " \t":
+                value = value[:index].rstrip()
+                break
+    return name.strip(), value
+
+
+def read_stored_key(name: str) -> str | None:
+    """Read one key from the watch-video config file, if present."""
+    path = config_env_path()
+    if not path.is_file():
+        return None
+    _warn_loose_permissions(path)
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return None
+    for line in lines:
+        parsed = _parse_env_line(line)
+        if parsed and parsed[0] == name and parsed[1]:
+            return parsed[1]
+    return None
+
+
+def set_stored_key(name: str, value: str) -> Path:
+    """Store a key in the config file with private permissions (0600)."""
+    if name not in KEY_NAMES.values():
+        raise ValueError(f"unsupported key name: {name}")
+    value = value.strip()
+    if not value:
+        raise ValueError("refusing to store an empty key")
+    if any(char in value for char in "\r\n"):
+        raise ValueError("key must be a single line")
+
+    path = config_env_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    os.chmod(path.parent, 0o700)
+
+    lines: list[str] = []
+    replaced = False
+    if path.is_file():
+        for line in path.read_text(encoding="utf-8").splitlines():
+            parsed = _parse_env_line(line)
+            if parsed and parsed[0] == name:
+                if not replaced:
+                    lines.append(f"{name}={value}")
+                    replaced = True
+                continue
+            lines.append(line)
+    if not replaced:
+        lines.append(f"{name}={value}")
+
+    tmp = path.with_name(path.name + ".tmp")
+    tmp.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    os.chmod(tmp, 0o600)
+    tmp.replace(path)
+    os.chmod(path, 0o600)
+    return path
 
 
 def _require_ffmpeg() -> None:
@@ -57,12 +159,12 @@ def default_model(provider: str) -> str:
 
 def _read_key(provider: str = "groq", api_key: str | None = None) -> str:
     env_name = "GROQ_API_KEY" if provider == "groq" else "OPENAI_API_KEY"
-    key = api_key or os.environ.get(env_name, "")
+    key = api_key or os.environ.get(env_name, "") or (read_stored_key(env_name) or "")
     key = key.strip()
     if not key:
         raise RuntimeError(
-            f"{env_name} is not set. fix: export {env_name}=... "
-            "or add it to your local shell environment"
+            f"{env_name} is not set. fix: export {env_name}=..., or store it once "
+            f"with scripts/doctor.py --set-key {provider} (writes {config_env_path()})"
         )
     return key
 
@@ -228,6 +330,9 @@ def _post_transcription(
             headers={
                 "Authorization": f"Bearer {key}",
                 "Content-Type": f"multipart/form-data; boundary={boundary}",
+                # A custom User-Agent is load-bearing: Groq sits behind
+                # Cloudflare, and the default Python-urllib UA can trip WAF
+                # rules with a 403 before auth even runs.
                 "User-Agent": "charms-watch-video/0.1",
             },
         )
@@ -305,6 +410,166 @@ def transcribe_audio(
         out_path.parent.mkdir(parents=True, exist_ok=True)
         out_path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     return data
+
+
+def audio_duration_seconds(audio_path: Path) -> float:
+    """Return the duration of an audio file in seconds via ffprobe."""
+    if shutil.which("ffprobe") is None:
+        raise RuntimeError("ffprobe is not installed. fix: brew install ffmpeg")
+    result = subprocess.run(
+        [
+            "ffprobe",
+            "-v",
+            "quiet",
+            "-print_format",
+            "json",
+            "-show_format",
+            str(audio_path),
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        raise RuntimeError(f"ffprobe failed on audio clip: {result.stderr.strip()}")
+    try:
+        fmt = json.loads(result.stdout or "{}").get("format", {})
+    except json.JSONDecodeError as exc:
+        raise RuntimeError("ffprobe returned invalid JSON for audio clip") from exc
+    return float(fmt.get("duration") or 0.0)
+
+
+def plan_chunks(
+    total_seconds: float,
+    total_bytes: int,
+    max_bytes: int = MAX_UPLOAD_BYTES,
+) -> list[tuple[float, float]]:
+    """Split a duration into contiguous (offset, duration) chunks under max_bytes.
+
+    Size scales linearly with duration (constant-bitrate mono mp3), so an even
+    time split yields evenly sized chunks. Returns one full-length chunk when
+    the audio already fits.
+    """
+    if total_bytes <= max_bytes or total_seconds <= 0:
+        return [(0.0, total_seconds)]
+
+    count = math.ceil(total_bytes / max_bytes)
+    chunk = total_seconds / count
+    plan: list[tuple[float, float]] = []
+    for index in range(count):
+        offset = index * chunk
+        # The last chunk absorbs rounding so durations sum exactly.
+        duration = (total_seconds - offset) if index == count - 1 else chunk
+        plan.append((round(offset, 3), round(duration, 3)))
+    return plan
+
+
+def split_audio(
+    full_audio: Path,
+    chunk_dir: Path,
+    plan: list[tuple[float, float]],
+) -> list[tuple[Path, float]]:
+    """Slice audio into per-plan chunk files, returning (path, offset) pairs.
+
+    Stream copy: no re-encode, no quality loss; mp3 frame boundaries are close
+    enough for transcription purposes.
+    """
+    _require_ffmpeg()
+    chunk_dir.mkdir(parents=True, exist_ok=True)
+    chunks: list[tuple[Path, float]] = []
+    for index, (offset, duration) in enumerate(plan):
+        out_path = chunk_dir / f"chunk_{index:03d}.mp3"
+        cmd = [
+            "ffmpeg",
+            "-hide_banner",
+            "-loglevel",
+            "error",
+            "-y",
+            "-ss",
+            f"{offset:.3f}",
+            "-i",
+            str(full_audio),
+            "-t",
+            f"{duration:.3f}",
+            "-c",
+            "copy",
+            str(out_path),
+        ]
+        result = subprocess.run(cmd, capture_output=True, text=True, check=False)
+        if result.returncode != 0 or not out_path.exists() or out_path.stat().st_size == 0:
+            raise RuntimeError(
+                f"ffmpeg failed to split audio chunk {index + 1}: {result.stderr.strip()}"
+            )
+        chunks.append((out_path, offset))
+    return chunks
+
+
+def transcribe_with_chunking(
+    audio_path: str | Path,
+    *,
+    out_json: str | Path | None = None,
+    model: str | None = None,
+    api_key: str | None = None,
+    provider: str = "groq",
+    offset_seconds: float = 0.0,
+    max_bytes: int = MAX_UPLOAD_BYTES,
+) -> tuple[list[dict[str, object]], list[str]]:
+    """Transcribe audio of any length, splitting past the provider upload cap.
+
+    Chunks are transcribed independently and their segment timestamps shifted
+    back into source time. A failed chunk is skipped with a warning so one bad
+    slice does not discard the whole transcript; raises RuntimeError only when
+    every chunk fails. Returns (segments, warnings).
+    """
+    audio = Path(audio_path).expanduser().resolve()
+    if not audio.exists():
+        raise RuntimeError(f"audio file not found: {audio}")
+
+    size = audio.stat().st_size
+    if size <= max_bytes:
+        data = transcribe_audio(
+            audio, out_json=out_json, model=model, api_key=api_key, provider=provider
+        )
+        return segments_from_response(data, offset_seconds=offset_seconds), []
+
+    label = provider_label(provider)
+    duration = audio_duration_seconds(audio)
+    plan = plan_chunks(duration, size, max_bytes)
+    chunks = split_audio(audio, audio.parent / "audio_chunks", plan)
+
+    segments: list[dict[str, object]] = []
+    raw_chunks: list[dict[str, object]] = []
+    warnings: list[str] = []
+    failures = 0
+    for index, (chunk_path, chunk_offset) in enumerate(chunks, start=1):
+        try:
+            data = transcribe_audio(
+                chunk_path, out_json=None, model=model, api_key=api_key, provider=provider
+            )
+        except RuntimeError as exc:
+            failures += 1
+            warnings.append(
+                f"{label} transcription chunk {index}/{len(chunks)} failed and was skipped: {exc}"
+            )
+            continue
+        segments.extend(
+            segments_from_response(data, offset_seconds=offset_seconds + chunk_offset)
+        )
+        raw_chunks.append(
+            {"index": index, "offset_seconds": chunk_offset, "response": data}
+        )
+
+    if failures == len(chunks):
+        raise RuntimeError(f"{label} transcription failed for all {len(chunks)} audio chunks")
+
+    if out_json is not None:
+        out_path = Path(out_json).expanduser().resolve()
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        payload = {"chunked": True, "chunk_count": len(chunks), "chunks": raw_chunks}
+        out_path.write_text(
+            json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+        )
+    return segments, warnings
 
 
 def segments_from_response(data: dict, *, offset_seconds: float = 0.0) -> list[dict[str, object]]:

@@ -81,9 +81,28 @@ such as an npm package, Docker image, or binary.
 ## Watch Video Defaults
 
 `watch-video` uses Groq `whisper-large-v3-turbo` as the default transcription
-fallback, prefers native captions before paid transcription, uses OpenAI
-`whisper-1` when `--transcriber openai` is requested, and keeps frame extraction
-bounded with automatic budgeting and hard caps.
+fallback, prefers native captions before paid transcription, and uses OpenAI
+`whisper-1` when `--transcriber openai` is requested. Captions are probed
+before any media download, and media downloads never request subtitles, so
+subtitle rate limits cannot fail a run; the default caption selector is
+English-preferred (never `all`, which fans out to 100+ auto-translate tracks
+and gets rate-limited). Frame extraction is scene-aware by default with a
+keyframe fast tier and a uniform fallback, drops near-duplicate frames before
+spending the budget, defaults to 512px-wide frames, and stays bounded by hard
+caps (100 frames; 300 in `full` detail). Whisper audio beyond the 24 MB upload
+cap is chunked and stitched with partial-failure tolerance.
+
+The agent asks the user which detail level to run for each new video
+(`transcript`, `efficient`, `balanced` recommended, `full`, ordered lightest
+to heaviest), skipping the question when the request, `--detail`,
+`WATCH_VIDEO_DETAIL`, a same-video re-run, or a non-interactive context
+already answers it; unanswerable runs default to `balanced`.
+
+Whisper keys are asked for once, only when a captionless video actually needs
+transcription, and stored via `doctor.py --set-key` in
+`~/.config/watch-video/.env` (mode 600); environment variables take
+precedence, declining falls back to captions/frames-only, and stored keys are
+never printed.
 
 ## Codex Reset Credit Safety
 

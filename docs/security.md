@@ -5,6 +5,10 @@ Secret-handling rules:
 - Never commit real API keys.
 - Use environment variables or gitignored `.env.local`.
 - `.env.local` must remain ignored and untracked.
+- `watch-video` may store Whisper keys in `~/.config/watch-video/.env`
+  (mode 600, outside the repo), written only by `doctor.py --set-key` from
+  stdin; environment variables take precedence and stored keys are never
+  printed.
 - Do not echo full keys.
 - CI must not require secrets.
 - Live Groq verification may source `.env.local` only inside a subshell.

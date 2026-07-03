@@ -7,6 +7,7 @@ import argparse
 import hashlib
 import html
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -24,35 +25,58 @@ from extract_frames import (  # noqa: E402
     DEFAULT_MAX_FRAMES,
     DEFAULT_WIDTH,
     FRAME_FORMATS,
+    FULL_MAX_FRAMES,
+    HARD_MAX_FRAMES,
+    extract_at_timestamps,
     extract_frames,
+    extract_keyframes,
+    extract_scene_frames,
     format_time,
+    merge_frames,
     parse_time,
-    resolve_range,
+    parse_timestamps,
     resolve_frame_plan,
+    resolve_range,
 )
 from groq_transcribe import (  # noqa: E402
-    DEFAULT_GROQ_MODEL,
-    DEFAULT_OPENAI_MODEL,
     default_model,
     extract_audio_clip,
-    segments_from_response,
-    transcribe_audio,
+    transcribe_with_chunking,
 )
 
 
 VIDEO_EXTENSIONS = {".mp4", ".mov", ".mkv", ".webm", ".m4v", ".avi", ".wmv", ".flv"}
+AUDIO_EXTENSIONS = {".m4a", ".mp3", ".opus", ".ogg", ".oga", ".aac", ".wav", ".mka"}
+CAPTION_SUFFIXES = {".vtt", ".srt"}
 REPORT_MODES = ("general", "tutorial", "ui-bug", "notes")
-SUBTITLE_LANGS = "en,en-orig,en-US,en-GB,en.*,all,-live_chat"
+DETAIL_MODES = ("transcript", "efficient", "balanced", "full")
+DEFAULT_DETAIL = "balanced"
+# English-preferred by default. Requesting every language ("all") fans out to
+# 100+ auto-translated tracks and gets the whole download rate-limited by the
+# source site; use --sub-langs for non-English videos instead.
+SUBTITLE_LANGS = "en,en-orig,en-US,en-GB,en.*,-live_chat"
 TIMESTAMP_RE = re.compile(
     r"(?P<start>\d{2}:\d{2}:\d{2}[\.,]\d{3})\s+-->\s+"
     r"(?P<end>\d{2}:\d{2}:\d{2}[\.,]\d{3})"
 )
 TAG_RE = re.compile(r"<[^>]+>")
+# Rolling auto-captions repeat the tail of the previous cue at the start of
+# the next one; require this many overlapping words before trimming so a
+# legitimately repeated short phrase is not mistaken for caption overlap.
+ROLLING_OVERLAP_MIN_WORDS = 3
 
 
 def is_url(source: str) -> bool:
+    if source.startswith("-"):
+        return False
     parsed = urlparse(source)
     return parsed.scheme in {"http", "https"} and bool(parsed.netloc)
+
+
+def default_detail() -> str:
+    """Session default detail level; override with WATCH_VIDEO_DETAIL."""
+    value = (os.environ.get("WATCH_VIDEO_DETAIL") or "").strip().lower()
+    return value if value in DETAIL_MODES else DEFAULT_DETAIL
 
 
 def safe_run_id(source: str) -> str:
@@ -102,6 +126,17 @@ def pick_video(media_dir: Path) -> Path | None:
             return matches[0]
     for candidate in sorted(media_dir.glob("video.*")):
         if candidate.suffix.lower() in VIDEO_EXTENSIONS:
+            return candidate
+    return None
+
+
+def pick_media(media_dir: Path, include_audio: bool = False) -> Path | None:
+    """Pick the downloaded media file; optionally accept audio-only files."""
+    video = pick_video(media_dir)
+    if video is not None or not include_audio:
+        return video
+    for candidate in sorted(media_dir.glob("video.*")):
+        if candidate.suffix.lower() in AUDIO_EXTENSIONS:
             return candidate
     return None
 
@@ -184,6 +219,37 @@ def pick_caption_info(media_dir: Path, raw_info: dict[str, object] | None = None
     return sorted(candidates, key=sort_key)[0]
 
 
+def find_sidecar_caption(video_path: Path) -> dict[str, object] | None:
+    """Find a subtitle file next to a local video (video.vtt, video.en.srt)."""
+    stem_prefix = video_path.stem + "."
+    try:
+        entries = sorted(video_path.parent.iterdir())
+    except OSError:
+        return None
+
+    ranked: list[tuple[tuple[int, int, str], dict[str, object]]] = []
+    for entry in entries:
+        if entry == video_path or not entry.is_file():
+            continue
+        if entry.suffix.lower() not in CAPTION_SUFFIXES:
+            continue
+        if not entry.name.startswith(stem_prefix):
+            continue
+        middle = entry.name[len(stem_prefix):-len(entry.suffix)].strip(".")
+        language = middle.split(".")[-1] if middle else None
+        language_rank = caption_language_rank(language) if language else 50
+        format_rank = 0 if entry.suffix.lower() == ".vtt" else 1
+        ranked.append(
+            (
+                (format_rank, language_rank, entry.name),
+                {"path": str(entry), "language": language, "caption_type": "sidecar"},
+            )
+        )
+    if not ranked:
+        return None
+    return sorted(ranked, key=lambda item: item[0])[0][1]
+
+
 def compact_info(info_path: Path, fallback_url: str | None = None) -> dict[str, object]:
     raw = load_raw_info(info_path)
     if not raw:
@@ -226,12 +292,67 @@ def format_download_section_time(seconds: float) -> str:
     return f"00:{remaining:02d}"
 
 
-def download_url(
+def probe_url(
+    url: str,
+    media_dir: Path,
+    sub_langs: str = SUBTITLE_LANGS,
+) -> tuple[dict[str, object] | None, dict[str, object]]:
+    """Fetch metadata and captions without downloading media.
+
+    This runs before any media download so caption-only requests never pay
+    for the video, and so the later media fetch does not request subtitles
+    at all (subtitle fan-out is what gets rate-limited by big hosts).
+    """
+    require_tool("yt-dlp", "brew install yt-dlp")
+    media_dir.mkdir(parents=True, exist_ok=True)
+    output_template = str(media_dir / "video.%(ext)s")
+    cmd = [
+        "yt-dlp",
+        "--skip-download",
+        "--ignore-errors",
+        "--no-playlist",
+        "--write-info-json",
+        "--write-subs",
+        "--write-auto-subs",
+        "--sub-langs",
+        sub_langs,
+        "--sub-format",
+        "vtt",
+        "--convert-subs",
+        "vtt",
+        "-o",
+        output_template,
+        "--",
+        url,
+    ]
+    result = run_command(cmd)
+
+    info_path = media_dir / "video.info.json"
+    raw_info = load_raw_info(info_path)
+    caption_info = pick_caption_info(media_dir, raw_info)
+    if not raw_info and caption_info is None and result.returncode != 0:
+        detail = (result.stderr or result.stdout).strip()
+        raise SystemExit(f"yt-dlp could not read the source. detail: {detail[-1200:]}")
+
+    info = compact_info(info_path, fallback_url=url)
+    if result.returncode != 0:
+        info["yt_dlp_probe_warning"] = (result.stderr or result.stdout).strip()[-1200:]
+    return caption_info, info
+
+
+def download_media(
     url: str,
     media_dir: Path,
     *,
+    audio_only: bool = False,
     download_section: str | None = None,
-) -> tuple[Path, dict[str, object] | None, dict[str, object]]:
+) -> tuple[Path, str | None]:
+    """Download media only (captions come from probe_url).
+
+    A subtitle failure can no longer kill the run: this call never requests
+    subtitles, passes --ignore-errors, and treats "media file present" as
+    success even when yt-dlp exits non-zero.
+    """
     require_tool("yt-dlp", "brew install yt-dlp")
     media_dir.mkdir(parents=True, exist_ok=True)
     output_template = str(media_dir / "video.%(ext)s")
@@ -239,42 +360,86 @@ def download_url(
         "yt-dlp",
         "-N",
         "4",
-        "-f",
-        "bv*[height<=720]+ba/b[height<=720]/b",
-        "--merge-output-format",
-        "mp4",
-        "--write-info-json",
-        "--write-subs",
-        "--write-auto-subs",
-        "--sub-langs",
-        SUBTITLE_LANGS,
-        "--sub-format",
-        "vtt",
-        "--convert-subs",
-        "vtt",
         "--no-playlist",
+        "--ignore-errors",
+        "-f",
+        "ba/bestaudio/b" if audio_only else "bv*[height<=720]+ba/b[height<=720]/b",
     ]
+    if not audio_only:
+        cmd.extend(["--merge-output-format", "mp4"])
     if download_section is not None:
         cmd.extend(["--download-sections", download_section])
     cmd.extend(["-o", output_template, "--", url])
+
     result = run_command(cmd)
-    video = pick_video(media_dir)
-    if video is None:
+    media = pick_media(media_dir, include_audio=audio_only)
+    if media is None:
         detail = (result.stderr or result.stdout).strip()
-        raise SystemExit(f"yt-dlp did not produce a video file. detail: {detail[-1200:]}")
+        raise SystemExit(f"yt-dlp did not produce a media file. detail: {detail[-1200:]}")
 
-    info_path = media_dir / "video.info.json"
-    raw_info = load_raw_info(info_path)
-    info = compact_info(info_path, fallback_url=url)
-    if download_section is not None:
-        info["download_section"] = download_section
-        info["focused_download_requested"] = True
+    warning = None
     if result.returncode != 0:
-        info["yt_dlp_warning"] = (result.stderr or result.stdout).strip()[-1200:]
-    return video, pick_caption_info(media_dir, raw_info), info
+        warning = (result.stderr or result.stdout).strip()[-1200:]
+    return media, warning
 
 
-def resolve_local(source: str) -> tuple[Path, None, dict[str, object]]:
+def resolve_from_run(prior_run: Path, source: str) -> tuple[Path, dict[str, object] | None, dict[str, object]]:
+    """Reuse a previous run's media and captions for a second pass.
+
+    Built for the transcript-cue workflow: read the transcript from run one,
+    then pin `--timestamps` frames in run two without re-probing or
+    re-downloading. Refuses trimmed section downloads because their media
+    does not line up with absolute source timestamps.
+    """
+    prior = Path(prior_run).expanduser().resolve()
+    prior_media = prior / "media"
+
+    meta: dict[str, object] = {}
+    metadata_path = prior / "metadata.json"
+    if metadata_path.is_file():
+        try:
+            data = json.loads(metadata_path.read_text(encoding="utf-8"))
+            if isinstance(data, dict):
+                meta = data
+        except (OSError, json.JSONDecodeError):
+            meta = {}
+
+    range_info = meta.get("range") if isinstance(meta.get("range"), dict) else {}
+    if range_info.get("focused_download_requested"):
+        raise SystemExit(
+            "--from-run points at a run that downloaded a trimmed section, so its media "
+            "does not start at 0:00. Re-run from the original URL instead."
+        )
+
+    video_path: Path | None = None
+    recorded = meta.get("video_path")
+    if isinstance(recorded, str) and recorded and Path(recorded).exists():
+        video_path = Path(recorded)
+    if video_path is None:
+        video_path = pick_media(prior_media, include_audio=True)
+    if video_path is None:
+        raise SystemExit(f"--from-run: no reusable media found under {prior}")
+
+    caption_info: dict[str, object] | None = None
+    recorded_caption = meta.get("caption_path")
+    if isinstance(recorded_caption, str) and recorded_caption and Path(recorded_caption).exists():
+        stored = meta.get("caption_info")
+        caption_info = dict(stored) if isinstance(stored, dict) else {}
+        caption_info["path"] = recorded_caption
+        caption_info.setdefault("language", None)
+        caption_info.setdefault("caption_type", "unknown")
+    else:
+        caption_info = pick_caption_info(prior_media, load_raw_info(prior_media / "video.info.json"))
+
+    stored_info = meta.get("source_info")
+    source_info: dict[str, object] = dict(stored_info) if isinstance(stored_info, dict) else {}
+    if not source_info:
+        source_info = {"url": source}
+    source_info["reused_run"] = str(prior)
+    return video_path, caption_info, source_info
+
+
+def resolve_local(source: str) -> tuple[Path, dict[str, object] | None, dict[str, object]]:
     path = Path(source).expanduser().resolve()
     if not path.exists():
         raise SystemExit(f"file not found: {path}")
@@ -285,7 +450,7 @@ def resolve_local(source: str) -> tuple[Path, None, dict[str, object]]:
     }
     if path.suffix.lower() not in VIDEO_EXTENSIONS:
         info["warning"] = f"{path.suffix} is not a common video extension"
-    return path, None, info
+    return path, find_sidecar_caption(path), info
 
 
 def ffprobe_metadata(video_path: Path) -> dict[str, object]:
@@ -341,6 +506,7 @@ def clean_caption_text(lines: list[str]) -> str:
 
 
 def parse_vtt(path: Path) -> list[dict[str, object]]:
+    """Parse WebVTT (and SRT, whose cue shape matches) into clean segments."""
     lines = path.read_text(encoding="utf-8", errors="ignore").splitlines()
     segments: list[dict[str, object]] = []
     index = 0
@@ -361,6 +527,24 @@ def parse_vtt(path: Path) -> list[dict[str, object]]:
             append_caption_segment(segments, start, end, text)
         index += 1
     return segments
+
+
+def _trim_word_overlap(previous: str, current: str) -> str:
+    """Trim a rolling-caption overlap where current starts with previous' tail.
+
+    YouTube auto-caption cues often carry two lines: the previous line again
+    plus one new line. Whole-text prefix checks miss that shape, so compare at
+    the word level and drop the longest shared boundary run.
+    """
+    prev_words = previous.split()
+    cur_words = current.split()
+    limit = min(len(prev_words), len(cur_words))
+    for size in range(limit, 0, -1):
+        if prev_words[-size:] == cur_words[:size]:
+            if size >= ROLLING_OVERLAP_MIN_WORDS or size == len(cur_words):
+                return " ".join(cur_words[size:])
+            break
+    return current
 
 
 def append_caption_segment(
@@ -389,6 +573,13 @@ def append_caption_segment(
             return
         if previous.endswith(f" {clean_text}"):
             segments[-1]["end"] = rounded_end
+            return
+        trimmed = _trim_word_overlap(previous, clean_text)
+        if trimmed != clean_text:
+            if not trimmed:
+                segments[-1]["end"] = rounded_end
+                return
+            segments.append({"start": round(start, 3), "end": rounded_end, "text": trimmed})
             return
 
     segments.append({"start": round(start, 3), "end": rounded_end, "text": clean_text})
@@ -470,6 +661,20 @@ def source_title(metadata: dict[str, object], source: str) -> str:
         or metadata.get("webpage_url")
         or source
     )
+
+
+def resolve_detail_cap(detail: str, user_max_frames: int | None) -> int:
+    """Resolve the frame cap for a detail level, honoring explicit overrides."""
+    hard_cap = FULL_MAX_FRAMES if detail == "full" else HARD_MAX_FRAMES
+    if user_max_frames is not None:
+        base = user_max_frames
+    elif detail == "efficient":
+        base = 50
+    elif detail == "full":
+        base = FULL_MAX_FRAMES
+    else:
+        base = DEFAULT_MAX_FRAMES
+    return max(1, min(base, hard_cap))
 
 
 def mode_sections(mode: str) -> list[str]:
@@ -569,6 +774,7 @@ def cleanup_artifacts(
     frames_dir: Path,
     cleanup: bool,
     cleanup_frames: bool,
+    chunks_dir: Path | None = None,
 ) -> list[str]:
     if cleanup_frames and not cleanup:
         raise ValueError("--cleanup-frames requires --cleanup")
@@ -581,6 +787,9 @@ def cleanup_artifacts(
     if audio_path.exists():
         audio_path.unlink()
         removed.append(str(audio_path))
+    if chunks_dir is not None and chunks_dir.exists():
+        shutil.rmtree(chunks_dir)
+        removed.append(str(chunks_dir))
     if cleanup_frames and frames_dir.exists():
         shutil.rmtree(frames_dir)
         removed.append(str(frames_dir))
@@ -602,12 +811,19 @@ def build_report(
     errors: list[str],
     frame_plan: dict[str, object] | None = None,
     mode: str = "general",
+    detail: str = DEFAULT_DETAIL,
+    engine_meta: dict[str, object] | None = None,
+    cue_meta: dict[str, object] | None = None,
     download_section: str | None = None,
     cleanup_note: str | None = None,
 ) -> str:
     title = source_title(metadata.get("source_info", {}) if metadata else {}, source)
     probe = metadata.get("probe", {}) if isinstance(metadata.get("probe"), dict) else {}
     duration = probe.get("duration_seconds")
+    if duration is None:
+        source_info = metadata.get("source_info", {}) if metadata else {}
+        if isinstance(source_info, dict) and isinstance(source_info.get("duration"), (int, float)):
+            duration = source_info["duration"]
     range_text = "full source"
     if clip_start is not None or clip_end is not None:
         range_text = f"{format_time(clip_start or 0.0)} to {format_time(clip_end)}"
@@ -619,6 +835,7 @@ def build_report(
         f"- Title: {title}",
         f"- Run directory: `{run_dir}`",
         f"- Range: {range_text}",
+        f"- Detail: {detail}",
     ]
     if duration is not None:
         lines.append(f"- Duration: {format_time(float(duration))} ({float(duration):.1f}s)")
@@ -642,25 +859,30 @@ def build_report(
         ]
     )
     if download_section:
-        lines.insert(5, f"- Focused download section requested: `{download_section}`")
-    if frame_plan:
-        mode_name = frame_plan.get("mode")
-        fps = float(frame_plan.get("fps") or 0.0)
-        interval = float(frame_plan.get("interval") or 0.0)
-        target = frame_plan.get("target_frames")
-        maximum = frame_plan.get("max_frames")
-        lines.extend(
-            [
-                "## Frame Plan",
-                "",
-                f"- Mode: {mode_name}",
-                f"- Selected FPS: {fps:.3g}",
-                f"- Selected interval: {interval:.3g}s",
-                f"- Target frames: {target}",
-                f"- Max frames: {maximum}",
-                "",
-            ]
-        )
+        lines.insert(6, f"- Focused download section requested: `{download_section}`")
+    if frame_plan or engine_meta or cue_meta:
+        lines.extend(["## Frame Selection", ""])
+        if engine_meta:
+            engine = engine_meta.get("engine")
+            fallback = " (uniform fallback)" if engine_meta.get("fallback") else ""
+            lines.append(f"- Engine: {engine}{fallback}")
+            lines.append(f"- Candidates detected: {engine_meta.get('candidate_count')}")
+            deduped = int(engine_meta.get("deduped_count") or 0)
+            if deduped:
+                lines.append(f"- Near-duplicates dropped: {deduped}")
+        if cue_meta:
+            dropped = int(cue_meta.get("dropped_out_of_window") or 0)
+            drop_note = f" ({dropped} outside the focused range dropped)" if dropped else ""
+            lines.append(
+                f"- Transcript-cue frames: {cue_meta.get('selected_count')}{drop_note}"
+            )
+        if frame_plan:
+            fps = float(frame_plan.get("fps") or 0.0)
+            lines.append(
+                f"- Uniform budget: mode {frame_plan.get('mode')}, fps {fps:.3g}, "
+                f"target {frame_plan.get('target_frames')}, max {frame_plan.get('max_frames')}"
+            )
+        lines.append("")
 
     if audio_error:
         lines.extend(["## Audio Notes", "", f"- {audio_error}", ""])
@@ -677,10 +899,17 @@ def build_report(
 
     if frames:
         lines.extend(["## Frames", ""])
-        for frame in frames[:20]:
-            lines.append(f"- `{frame['path']}` at {frame['timestamp']}")
-        if len(frames) > 20:
-            lines.append(f"- ... {len(frames) - 20} more frame(s)")
+        lines.append(
+            "Read every frame path below with the Read tool - batch the reads "
+            "in parallel in one message. Frames are chronological; timestamps "
+            "are absolute source time."
+        )
+        lines.append("")
+        for frame in frames[:40]:
+            reason = frame.get("reason", "selected")
+            lines.append(f"- `{frame['path']}` at {frame['timestamp']} ({reason})")
+        if len(frames) > 40:
+            lines.append(f"- ... {len(frames) - 40} more frame(s)")
         lines.append("")
 
     lines.extend(["## Transcript Preview", ""])
@@ -698,9 +927,10 @@ def build_report(
             "",
             "## Agent Notes",
             "",
-            "- Read frames before answering visual questions.",
+            "- Read frames before answering visual questions; batch Read calls in parallel.",
             "- Summarize the transcript unless the user asks for the full text.",
             "- Cite timestamps when describing actions, UI state, tools, or commands.",
+            "- For follow-up questions, answer from evidence already in context; do not re-run.",
         ]
     )
     return "\n".join(lines).rstrip() + "\n"
@@ -718,6 +948,16 @@ def main() -> int:
         help="Base directory for run artifacts (default: .watch-video/runs)",
     )
     parser.add_argument(
+        "--detail",
+        choices=DETAIL_MODES,
+        default=default_detail(),
+        help=(
+            "Fidelity dial: transcript (no frames, skips media download when captions "
+            "exist), efficient (fast keyframes, cap 50), balanced (scene-aware, cap 80), "
+            "full (scene-aware, cap 300). Default: balanced or $WATCH_VIDEO_DETAIL."
+        ),
+    )
+    parser.add_argument(
         "--transcriber",
         choices=["groq", "openai", "none"],
         default="groq",
@@ -729,13 +969,41 @@ def main() -> int:
         default="general",
         help="Report scaffold to generate (default: general)",
     )
+    parser.add_argument(
+        "--sub-langs",
+        default=SUBTITLE_LANGS,
+        help=(
+            "yt-dlp subtitle language selector (default English variants). "
+            "Use e.g. 'es,es.*' for non-English videos."
+        ),
+    )
+    parser.add_argument(
+        "--timestamps",
+        help=(
+            "Comma-separated absolute timestamps (SS, MM:SS, HH:MM:SS) to pin a frame at - "
+            "use for transcript cues like 'look here' or 'as you can see'. Pinned frames "
+            "are reserved against the frame cap."
+        ),
+    )
+    parser.add_argument(
+        "--from-run",
+        help=(
+            "Reuse media and captions from a previous run directory instead of probing "
+            "and downloading again (ideal for a --timestamps second pass)."
+        ),
+    )
     parser.add_argument("--frames", dest="frames", action="store_true", default=True, help="Extract frames")
     parser.add_argument("--no-frames", dest="frames", action="store_false", help="Skip frame extraction")
+    parser.add_argument(
+        "--no-dedup",
+        action="store_true",
+        help="Keep near-duplicate frames instead of collapsing them",
+    )
     parser.add_argument(
         "--frame-mode",
         choices=["auto", "interval"],
         default="auto",
-        help="Use automatic frame budgeting or a fixed interval (default: auto)",
+        help="auto: detail engine decides; interval: force fixed-interval uniform sampling",
     )
     parser.add_argument(
         "--frame-interval",
@@ -743,19 +1011,22 @@ def main() -> int:
         default=DEFAULT_INTERVAL_SECONDS,
         help="Seconds between frames in interval mode (default: 5)",
     )
-    parser.add_argument("--fps", type=float, help="Explicit FPS override, capped at 2")
+    parser.add_argument("--fps", type=float, help="Explicit FPS override (forces uniform sampling, capped at 2)")
     parser.add_argument(
         "--max-frames",
         type=int,
-        default=DEFAULT_MAX_FRAMES,
-        help="Maximum extracted frames, hard-capped at 100 (default: 80)",
+        default=None,
+        help=(
+            "Frame cap override. Defaults by detail: efficient 50, balanced 80, full 300 "
+            "(hard caps 100 / 300)."
+        ),
     )
     parser.add_argument(
         "--frame-width",
         "--resolution",
         type=int,
         default=DEFAULT_WIDTH,
-        help="Output frame width in pixels (default: 960)",
+        help="Output frame width in pixels (default: 512; use 1024 for on-screen text)",
     )
     parser.add_argument(
         "--frame-format",
@@ -777,6 +1048,7 @@ def main() -> int:
         requested_start = parse_time(args.start)
         requested_end = parse_time(args.end)
         requested_duration = parse_time(args.duration)
+        cue_timestamps = parse_timestamps(args.timestamps)
         download_section = download_section_for_args(
             requested_start,
             requested_end,
@@ -794,21 +1066,73 @@ def main() -> int:
 
     print(f"[watch-video] run directory: {run_dir}", file=sys.stderr)
 
+    detail = args.detail
+    frames_requested = args.frames and detail != "transcript"
+    cues_requested = args.frames and bool(cue_timestamps)
+
+    errors: list[str] = []
     caption_info: dict[str, object] | None
-    if is_url(args.source):
-        print("[watch-video] downloading source with yt-dlp", file=sys.stderr)
-        video_path, caption_info, source_info = download_url(
-            args.source,
-            media_dir,
-            download_section=download_section,
-        )
+    video_path: Path | None
+    media_warning: str | None = None
+
+    if args.from_run:
+        print("[watch-video] reusing media from a previous run", file=sys.stderr)
+        video_path, caption_info, source_info = resolve_from_run(Path(args.from_run), args.source)
+        download_section = None
+    elif is_url(args.source):
+        print("[watch-video] probing metadata and captions with yt-dlp", file=sys.stderr)
+        caption_info, source_info = probe_url(args.source, media_dir, args.sub_langs)
     else:
         print("[watch-video] using local source", file=sys.stderr)
         video_path, caption_info, source_info = resolve_local(args.source)
 
     caption_path = Path(str(caption_info["path"])) if caption_info else None
 
-    probe = ffprobe_metadata(video_path)
+    all_caption_segments: list[dict[str, object]] = []
+    caption_parse_error: str | None = None
+    if caption_path is not None:
+        try:
+            all_caption_segments = parse_vtt(caption_path)
+        except OSError as exc:
+            caption_parse_error = f"caption parse failed: {exc}"
+            errors.append(caption_parse_error)
+
+    if is_url(args.source) and not args.from_run:
+        info_duration = (
+            float(source_info["duration"])
+            if isinstance(source_info.get("duration"), (int, float))
+            else None
+        )
+        captions_ok = bool(all_caption_segments) and not captions_are_insufficient(
+            all_caption_segments, info_duration
+        )
+        need_transcription_media = args.transcriber != "none" and not captions_ok
+        need_media = frames_requested or cues_requested or need_transcription_media
+        audio_only = need_media and not (frames_requested or cues_requested)
+        if need_media:
+            label = "audio" if audio_only else "video"
+            print(f"[watch-video] downloading {label} with yt-dlp", file=sys.stderr)
+            video_path, media_warning = download_media(
+                args.source,
+                media_dir,
+                audio_only=audio_only,
+                download_section=download_section,
+            )
+            if download_section is not None:
+                source_info["download_section"] = download_section
+                source_info["focused_download_requested"] = True
+            if audio_only:
+                source_info["audio_only_download"] = True
+        else:
+            print(
+                "[watch-video] captions cover the request; skipping media download",
+                file=sys.stderr,
+            )
+            video_path = None
+        if media_warning:
+            errors.append(f"yt-dlp warning: {media_warning[-300:]}")
+
+    probe = ffprobe_metadata(video_path) if video_path is not None else {}
     total_duration = (
         float(probe["duration_seconds"])
         if isinstance(probe.get("duration_seconds"), (int, float))
@@ -828,11 +1152,14 @@ def main() -> int:
         raise SystemExit(str(exc)) from exc
 
     focused = any(value is not None for value in [requested_start, requested_end, requested_duration])
-    focused_download = is_url(args.source) and download_section is not None
+    focused_download = (
+        is_url(args.source) and download_section is not None and video_path is not None
+    )
     processing_start = None if focused_download else ((clip_start or 0.0) if focused else None)
     processing_duration = clip_duration if focused else None
     timestamp_offset = (clip_start or 0.0) if focused else None
     plan_duration = clip_duration if focused else source_total_duration
+    frame_cap = resolve_detail_cap(detail, args.max_frames)
     try:
         frame_plan = resolve_frame_plan(
             plan_duration,
@@ -840,60 +1167,57 @@ def main() -> int:
             frame_mode=args.frame_mode,
             frame_interval=args.frame_interval,
             fps=args.fps,
-            max_frames=args.max_frames,
+            max_frames=frame_cap,
         )
     except ValueError as exc:
         raise SystemExit(str(exc)) from exc
 
     audio_path = run_dir / "audio.mp3"
-    errors: list[str] = []
+    chunks_dir = run_dir / "audio_chunks"
     errors.extend(str(warning) for warning in frame_plan.get("warnings", []))
     audio_error: str | None = None
 
-    try:
-        extract_audio_clip(
-            video_path,
-            audio_path,
-            start=processing_start,
-            duration=processing_duration,
-        )
-    except (RuntimeError, ValueError) as exc:
-        audio_error = str(exc)
-        errors.append(audio_error)
+    if video_path is not None:
+        try:
+            extract_audio_clip(
+                video_path,
+                audio_path,
+                start=processing_start,
+                duration=processing_duration,
+            )
+        except (RuntimeError, ValueError) as exc:
+            # Rendered once under "Audio Notes"; keep it out of Warnings.
+            audio_error = str(exc)
 
     transcript_source = "none"
     transcript_segments: list[dict[str, object]] = []
     raw_transcript: dict[str, object] = {"source": "none", "segments": []}
     captions_insufficient = False
 
-    if caption_path is not None:
-        try:
-            all_caption_segments = parse_vtt(caption_path)
-            transcript_segments = filter_segments(all_caption_segments, clip_start, clip_end)
-            transcript_source = "native captions"
-            coverage_seconds = transcript_coverage_seconds(all_caption_segments)
-            coverage_ratio = caption_coverage_ratio(all_caption_segments, source_total_duration)
-            captions_insufficient = captions_are_insufficient(
-                all_caption_segments,
-                source_total_duration,
+    if all_caption_segments:
+        transcript_segments = filter_segments(all_caption_segments, clip_start, clip_end)
+        transcript_source = "native captions"
+        coverage_seconds = transcript_coverage_seconds(all_caption_segments)
+        coverage_ratio = caption_coverage_ratio(all_caption_segments, source_total_duration)
+        captions_insufficient = captions_are_insufficient(
+            all_caption_segments,
+            source_total_duration,
+        )
+        if captions_insufficient:
+            ratio_text = f"{coverage_ratio:.0%}" if coverage_ratio is not None else "unknown"
+            errors.append(
+                "native captions look incomplete "
+                f"({coverage_seconds:.1f}s coverage, ratio {ratio_text}); trying fallback if available"
             )
-            if captions_insufficient:
-                ratio_text = f"{coverage_ratio:.0%}" if coverage_ratio is not None else "unknown"
-                errors.append(
-                    "native captions look incomplete "
-                    f"({coverage_seconds:.1f}s coverage, ratio {ratio_text}); trying fallback if available"
-                )
-            raw_transcript = {
-                "source": "native_captions",
-                "caption_path": str(caption_path),
-                "caption_type": caption_info.get("caption_type") if caption_info else "unknown",
-                "language": caption_info.get("language") if caption_info else None,
-                "coverage_seconds": coverage_seconds,
-                "coverage_ratio": coverage_ratio,
-                "segments": transcript_segments,
-            }
-        except OSError as exc:
-            errors.append(f"caption parse failed: {exc}")
+        raw_transcript = {
+            "source": "native_captions",
+            "caption_path": str(caption_path),
+            "caption_type": caption_info.get("caption_type") if caption_info else "unknown",
+            "language": caption_info.get("language") if caption_info else None,
+            "coverage_seconds": coverage_seconds,
+            "coverage_ratio": coverage_ratio,
+            "segments": transcript_segments,
+        }
 
     needs_transcription = (not transcript_segments or captions_insufficient) and args.transcriber != "none"
     if needs_transcription:
@@ -903,16 +1227,14 @@ def main() -> int:
             try:
                 raw_path = run_dir / f"{args.transcriber}_transcript.raw.json"
                 provider_model = default_model(args.transcriber)
-                transcriber_data = transcribe_audio(
+                fallback_segments, chunk_warnings = transcribe_with_chunking(
                     audio_path,
                     out_json=raw_path,
                     model=provider_model,
                     provider=args.transcriber,
-                )
-                fallback_segments = segments_from_response(
-                    transcriber_data,
                     offset_seconds=(clip_start or 0.0) if focused else 0.0,
                 )
+                errors.extend(chunk_warnings)
                 if fallback_segments:
                     transcript_segments = fallback_segments
                     transcript_source = f"{args.transcriber} whisper"
@@ -931,30 +1253,91 @@ def main() -> int:
         raw_transcript = {"source": "none", "segments": []}
 
     frames: list[dict[str, object]] = []
-    if args.frames:
-        try:
-            frames = extract_frames(
-                video_path,
-                frames_dir,
-                start=processing_start,
-                duration=processing_duration,
-                frame_mode=args.frame_mode,
-                frame_interval=args.frame_interval,
-                fps=float(frame_plan["fps"]),
-                max_frames=int(frame_plan["target_frames"]),
-                width=args.frame_width,
-                frame_format=args.frame_format,
-                timestamp_offset=timestamp_offset,
+    engine_meta: dict[str, object] | None = None
+    cue_frames: list[dict[str, object]] = []
+    cue_meta: dict[str, object] | None = None
+    media_has_video = bool(probe.get("width"))
+
+    if args.frames and video_path is not None and media_has_video:
+        media_time_offset = (clip_start or 0.0) if focused_download else 0.0
+        if cue_timestamps:
+            try:
+                cue_frames, cue_meta = extract_at_timestamps(
+                    video_path,
+                    frames_dir,
+                    cue_timestamps,
+                    width=args.frame_width,
+                    frame_format=args.frame_format,
+                    max_frames=frame_cap,
+                    window_start=clip_start,
+                    window_end=clip_end,
+                    media_time_offset=media_time_offset,
+                )
+                dropped_cues = int(cue_meta.get("dropped_out_of_window") or 0)
+                if dropped_cues:
+                    errors.append(
+                        f"{dropped_cues} cue timestamp(s) fell outside the focused range "
+                        "and were dropped"
+                    )
+            except (RuntimeError, ValueError) as exc:
+                errors.append(str(exc))
+
+        engine_budget = max(0, frame_cap - len(cue_frames))
+        if frames_requested and engine_budget > 0:
+            forced_uniform = args.frame_mode == "interval" or args.fps is not None
+            engine_kwargs = {
+                "start": processing_start,
+                "duration": processing_duration,
+                "width": args.frame_width,
+                "frame_format": args.frame_format,
+                "timestamp_offset": timestamp_offset,
+                "dedup": not args.no_dedup,
+            }
+            try:
+                if forced_uniform:
+                    frames, engine_meta = extract_frames(
+                        video_path,
+                        frames_dir,
+                        frame_mode=args.frame_mode,
+                        frame_interval=args.frame_interval,
+                        fps=float(frame_plan["fps"]),
+                        max_frames=min(int(frame_plan["target_frames"]), engine_budget),
+                        **engine_kwargs,
+                    )
+                elif detail == "efficient":
+                    frames, engine_meta = extract_keyframes(
+                        video_path,
+                        frames_dir,
+                        max_frames=engine_budget,
+                        **engine_kwargs,
+                    )
+                else:
+                    frames, engine_meta = extract_scene_frames(
+                        video_path,
+                        frames_dir,
+                        max_frames=engine_budget,
+                        **engine_kwargs,
+                    )
+            except (RuntimeError, ValueError) as exc:
+                errors.append(str(exc))
+
+        if cue_frames:
+            frames = merge_frames(frames, cue_frames)
+        if len(frames) > 250:
+            errors.append(
+                f"{len(frames)} frames selected; reading them all will use a large "
+                "number of image tokens"
             )
-        except (RuntimeError, ValueError) as exc:
-            errors.append(str(exc))
+    elif args.frames and video_path is not None and frames_requested and not media_has_video:
+        errors.append("media has no video stream; frames skipped")
 
     metadata = {
         "source": args.source,
         "source_info": source_info,
-        "video_path": str(video_path),
+        "video_path": str(video_path) if video_path else None,
         "caption_path": str(caption_path) if caption_path else None,
         "caption_info": caption_info,
+        "subtitle_langs": args.sub_langs,
         "probe": probe,
         "range": {
             "start_seconds": clip_start,
@@ -966,17 +1349,23 @@ def main() -> int:
         },
         "frames": {
             "enabled": args.frames,
+            "detail": detail,
             "count": len(frames),
             "mode": args.frame_mode,
             "frame_interval": args.frame_interval,
             "fps": args.fps,
             "selected_fps": frame_plan.get("fps"),
             "target_frames": frame_plan.get("target_frames"),
+            "frame_cap": frame_cap,
             "max_frames": args.max_frames,
             "width": args.frame_width,
             "format": args.frame_format,
+            "dedup": not args.no_dedup,
+            "engine": engine_meta,
+            "cues": cue_meta,
         },
         "transcriber": args.transcriber,
+        "audio_error": audio_error,
         "errors": errors,
     }
     write_json(run_dir / "metadata.json", metadata)
@@ -997,6 +1386,9 @@ def main() -> int:
         errors=errors,
         frame_plan=frame_plan,
         mode=args.mode,
+        detail=detail,
+        engine_meta=engine_meta,
+        cue_meta=cue_meta,
         download_section=download_section,
         cleanup_note=(
             "cleanup requested; media/audio will be removed"
@@ -1015,6 +1407,7 @@ def main() -> int:
             frames_dir=frames_dir,
             cleanup=args.cleanup,
             cleanup_frames=args.cleanup_frames,
+            chunks_dir=chunks_dir,
         )
     except ValueError as exc:
         raise SystemExit(str(exc)) from exc

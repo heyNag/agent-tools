@@ -12,12 +12,21 @@ packages/watch-video/skills/watch-video
 
 ## Flow
 
+0. Ask the user which detail level to run (`transcript`, `efficient`,
+   `balanced` recommended, `full`) unless the request or environment already
+   answers it.
 1. Accept a source URL or local file path.
-2. Fetch metadata where possible.
-3. Prefer native captions/transcripts.
-4. Extract a focused audio clip.
-5. Use Groq Whisper fallback when captions are missing or insufficient.
-6. Optionally extract bounded frames.
+2. Probe metadata and captions first (URLs download no media for
+   caption-covered transcript requests; local files pick up sidecar
+   subtitles).
+3. Download only what the run needs: full media for frames, audio-only for
+   Whisper, nothing when captions suffice.
+4. Extract a focused audio clip when media is present.
+5. Use Groq Whisper fallback when captions are missing or insufficient,
+   auto-chunking audio past the 24 MB upload cap.
+6. Extract bounded frames: scene-aware by default, keyframe-only at
+   `--detail efficient`, uniform fallback for static footage, near-duplicates
+   dropped, optional `--timestamps` cue pinning.
 7. Write a report and artifacts under `.watch-video/runs/<run-id>/`.
 
 Expected outputs:
@@ -75,17 +84,20 @@ bash -lc 'set -a; source .env.local >/dev/null 2>&1; set +a; python3 packages/wa
 
 ## Useful Options
 
+- `--detail transcript|efficient|balanced|full`
 - `--transcriber groq|openai|none`
 - `--mode general|tutorial|ui-bug|notes`
-- `--frame-mode auto|interval`
-- `--fps`
-- `--resolution`
+- `--timestamps T1,T2,...`
+- `--from-run DIR`
+- `--sub-langs`
+- `--max-frames`
+- `--resolution` (default 512)
 - `--frame-format jpeg|png|webp`
+- `--no-dedup`
 - `--cleanup`
 
 ## Future Improvements
 
 - better visual report summaries
-- configurable transcript providers
-- robust caption fallback diagnostics
+- deeper caption-fallback diagnostics
 - real MCP tools later only if there is a concrete server-side workflow
