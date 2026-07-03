@@ -118,7 +118,9 @@ jobs:
 
           - \`packages/${SKILL}\`
 
-          Claude Desktop custom-skill artifacts can be built locally with:
+          When this skill targets Claude Desktop / claude.ai, a ready-to-upload
+          custom-skill ZIP is attached to this release. It can also be built
+          locally with:
 
           - \`make build-packages\`
 
@@ -130,3 +132,18 @@ jobs:
             --notes-file "${notes_file}" \
             --target "${COMMIT_SHA}" \
             --latest=false
+
+      - name: Attach Claude Desktop custom-skill artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SKILL: ${{ inputs.skill }}
+          VERSION: ${{ steps.bump.outputs.version }}
+        run: |
+          artifact_dir=".dist/claude/custom-skills/${SKILL}"
+          if [ ! -d "${artifact_dir}" ]; then
+            echo "No Claude Desktop artifact for ${SKILL}; skipping upload."
+            exit 0
+          fi
+          zip_name="${SKILL}-claude-custom-skill-${VERSION}.zip"
+          (cd .dist/claude/custom-skills && zip -qr "${zip_name}" "${SKILL}")
+          gh release upload "${SKILL}@${VERSION}" ".dist/claude/custom-skills/${zip_name}"

@@ -96,6 +96,9 @@ clean path.
 8. Pushes to `main`, rebasing and retrying if a concurrent release advanced the
    branch.
 9. Creates a GitHub Release tagged `<skill>@<version>`.
+10. Attaches the Claude Desktop custom-skill ZIP
+    (`<skill>-claude-custom-skill-<version>.zip`) when the skill targets that
+    surface.
 
 ## New Skill Release Readiness
 
